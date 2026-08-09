@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useState } from "react";
@@ -8,7 +9,6 @@ import InfoCTA from "../components/info/InfoCTA";
 
 import {
   CircleHelp,
-  Search,
   ChevronDown,
   ChevronUp,
 } from "lucide-react";
@@ -48,28 +48,12 @@ export default function FAQPage() {
     <InfoLayout>
       <InfoHero
         title="Frequently Asked Questions"
-        subtitle="Temukan jawaban atas pertanyaan yang paling sering diajukan mengenai penggunaan MediVault."
-        icon={<CircleHelp size={40} />}
+        subtitle="Temukan jawaban atas pertanyaan yang paling sering diajukan mengenai penggunaan Medivault."
+        icon={<CircleHelp />}
       />
 
-      {/* SEARCH */}
-      <section className="mx-auto max-w-6xl px-6">
-        <div className="relative">
-          <Search
-            className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"
-            size={20}
-          />
-
-          <input
-            type="text"
-            placeholder="Cari pertanyaan..."
-            className="w-full rounded-[28px] border border-slate-200 bg-white py-5 pl-14 pr-6 text-lg shadow-lg outline-none transition focus:border-[#0F766E]"
-          />
-        </div>
-      </section>
-
       {/* FAQ */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section className="mx-auto max-w-6xl px-6 pt-2 pb-16">
         <div className="space-y-5">
           {faqs.map((faq, index) => (
             <div
@@ -107,26 +91,27 @@ export default function FAQPage() {
 
       {/* CONTACT */}
       <section className="mx-auto max-w-5xl px-6 pb-20">
-        <div className="rounded-[36px] bg-gradient-to-r from-[#ECFDF5] to-white p-10 text-center shadow-lg">
-          <h2 className="text-3xl font-black text-[#061B3A]">
-            Masih belum menemukan jawaban?
-          </h2>
+  <div className="rounded-[32px] border border-[#DDF3EC] bg-[#F5FCF9] px-8 py-10 text-center">
+    <h2 className="text-3xl font-black text-[#061B3A]">
+      Masih belum menemukan jawaban?
+    </h2>
 
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-            Jika pertanyaan Anda belum terjawab, silakan hubungi tim
-            Medivault melalui halaman Kontak. Kami siap membantu Anda.
-          </p>
+    <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-slate-600">
+      Jika pertanyaan Anda belum terjawab, silakan hubungi tim
+      Medivault melalui halaman Kontak. Kami siap membantu Anda.
+    </p>
 
-          <a
-  href="/kontak"
-  className="mt-8 inline-flex items-center rounded-full bg-[#0F766E] px-8 py-4 font-bold text-white shadow-lg transition-all duration-300 hover:-translate-y-1 hover:bg-[#0C665F] hover:shadow-xl"
->
-  Hubungi Kami
-</a>
-        </div>
-      </section>
+    <a
+      href="/kontak"
+      className="mt-7 inline-flex items-center rounded-full bg-[#0F766E] px-8 py-4 font-bold text-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:bg-[#0C665F] hover:shadow-lg"
+    >
+      Hubungi Kami
+    </a>
+  </div>
+</section>
 
       <InfoCTA />
     </InfoLayout>
   );
 }
+

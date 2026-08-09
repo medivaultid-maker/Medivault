@@ -8,7 +8,6 @@ import InfoCTA from "../components/info/InfoCTA";
 
 import {
   Newspaper,
-  Search,
   Clock3,
   ArrowRight,
   BookOpen,
@@ -83,45 +82,32 @@ export default function BlogPage() {
   return (
     <InfoLayout>
       <InfoHero
-        title="Blog MediVault"
+        title="Blog Medivault"
         subtitle="Temukan artikel, tips belajar, dan informasi terbaru untuk membantu perjalanan Anda menjadi dokter yang kompeten."
         icon={<Newspaper size={40} />}
       />
 
-      {/* SEARCH */}
-      <section className="mx-auto max-w-6xl px-6">
-        <div className="relative">
-          <Search
-            className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400"
-            size={20}
-          />
-
-          <input
-            type="text"
-            placeholder="Cari artikel..."
-            className="w-full rounded-[28px] border border-slate-200 bg-white py-5 pl-14 pr-6 text-lg shadow-lg outline-none transition focus:border-[#0F766E]"
-          />
-        </div>
-
-        <div className="mt-8 flex flex-wrap justify-center gap-4">
-          {categories.map((item) => (
-            <button
-  key={item}
-  onClick={() => setSelectedCategory(item)}
-  className={`rounded-full border px-5 py-2 font-semibold transition ${
-    selectedCategory === item
-      ? "bg-[#0F766E] text-white"
-      : "border-[#DDFBEF] bg-[#ECFDF5] text-[#0F766E] hover:bg-[#0F766E] hover:text-white"
-  }`}
->
-              {item}
-            </button>
-          ))}
-        </div>
-      </section>
+     {/* CATEGORIES */}
+<section className="mx-auto max-w-6xl px-6 pt-4">
+  <div className="flex flex-wrap justify-center gap-4">
+    {categories.map((item) => (
+      <button
+        key={item}
+        onClick={() => setSelectedCategory(item)}
+        className={`rounded-full border px-5 py-2 font-semibold transition ${
+          selectedCategory === item
+            ? "bg-[#0F766E] text-white"
+            : "border-[#DDFBEF] bg-[#ECFDF5] text-[#0F766E] hover:bg-[#0F766E] hover:text-white"
+        }`}
+      >
+        {item}
+      </button>
+    ))}
+  </div>
+</section>
 
       {/* ARTICLES */}
-      <section className="mx-auto max-w-7xl px-6 py-16">
+      <section className="mx-auto max-w-7xl px-6 pt-10 pb-16">
         <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
           {filteredArticles.map((article) => (
             <div
@@ -165,26 +151,7 @@ export default function BlogPage() {
           ))}
         </div>
       </section>
-
-      {/* COMING SOON */}
-      <section className="mx-auto max-w-5xl px-6 pb-20">
-        <div className="rounded-[36px] bg-gradient-to-r from-[#ECFDF5] to-white p-10 text-center shadow-lg">
-          <h2 className="text-3xl font-black text-[#061B3A]">
-            Artikel Baru Akan Terus Ditambahkan
-          </h2>
-
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-            Tim Medivault akan secara berkala menghadirkan artikel terbaru
-            mengenai pembelajaran kedokteran, tips UKMPPD, OSCE, koas,
-            hingga pembahasan kasus klinis.
-          </p>
-
-          <div className="mt-8 inline-flex rounded-full bg-[#0F766E] px-8 py-4 font-bold text-white shadow-lg">
-            🚀 Coming Soon
-          </div>
-        </div>
-      </section>
-
+      
       <InfoCTA />
     </InfoLayout>
   );

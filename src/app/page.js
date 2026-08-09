@@ -427,29 +427,43 @@ text-[#234F42]">
               </h3>
 
               <ul className="space-y-3 text-sm font-medium text-slate-500">
-                <li>
-                  <Link
-                    href="/"
-                    className="font text-[#0F766E] transition hover:text-[#061B3A]"
-                  >
-                    Beranda
-                  </Link>
-                </li>
-                <li>
-                  <Link href="#fitur" className="transition hover:text-[#0F766E]">
-                    Fitur
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/simulasi" className="transition hover:text-[#0F766E]">
-                    Simulasi
-                  </Link>
-                </li>
-                <li>
-                  <Link href="/token" className="transition hover:text-[#0F766E]">
-                    Akses Latihan
-                  </Link>
-                </li>
+              
+<li>
+  <Link
+    href="/"
+    className="transition hover:text-[#0F766E]"
+  >
+    Beranda
+  </Link>
+</li>
+
+<li>
+  <Link
+    href="/simulasi"
+    className="transition hover:text-[#0F766E]"
+  >
+    Simulasi
+  </Link>
+</li>
+
+<li>
+  <Link
+    href="/token"
+    className="transition hover:text-[#0F766E]"
+  >
+    Akses Latihan
+  </Link>
+</li>
+
+<li>
+  <Link
+    href="/materi"
+    className="transition hover:text-[#0F766E]"
+  >
+    Materi Kedokteran
+  </Link>
+</li>
+
               </ul>
             </div>
 

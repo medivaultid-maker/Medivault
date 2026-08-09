@@ -57,33 +57,35 @@ export default function PanduanPenggunaPage() {
         icon={<BookOpen size={40} />}
       />
 
-      {/* STEPS */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
-        <div className="space-y-8">
-          {steps.map((step) => (
-            <div
-              key={step.title}
-              className="rounded-[30px] border border-[#E7F6F0] bg-white p-8 shadow-lg transition hover:-translate-y-1 hover:shadow-xl"
-            >
-              <div className="flex items-start gap-6">
-                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-[#ECFDF5] text-[#0F766E]">
-                  {step.icon}
-                </div>
+    
+{/* STEPS */}
+<section className="mx-auto max-w-6xl px-6 pt-4 pb-14">
+  <div className="space-y-5">
+    {steps.map((step) => (
+      <div
+        key={step.title}
+        className="rounded-[30px] border border-[#E7F6F0] bg-white p-6 shadow-lg transition hover:-translate-y-1 hover:shadow-xl"
+      >
+        <div className="flex items-start gap-5">
+          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl bg-[#ECFDF5] text-[#0F766E]">
+            {step.icon}
+          </div>
 
-                <div>
-                  <h2 className="text-2xl font-black text-[#061B3A]">
-                    {step.title}
-                  </h2>
+          <div>
+            <h2 className="text-2xl font-black text-[#061B3A]">
+              {step.title}
+            </h2>
 
-                  <p className="mt-4 leading-8 text-slate-600">
-                    {step.description}
-                  </p>
-                </div>
-              </div>
-            </div>
-          ))}
+            <p className="mt-3 leading-8 text-slate-600">
+              {step.description}
+            </p>
+          </div>
         </div>
-      </section>
+      </div>
+    ))}
+  </div>
+</section>
+
 
       {/* TIPS */}
       <section className="mx-auto max-w-6xl px-6 pb-16">
@@ -110,25 +112,24 @@ export default function PanduanPenggunaPage() {
 
       {/* HELP */}
       <section className="mx-auto max-w-5xl px-6 pb-20">
-        <div className="rounded-[36px] bg-gradient-to-r from-[#ECFDF5] to-white p-10 text-center shadow-lg">
-          <h2 className="text-3xl font-black text-[#061B3A]">
-            Masih Bingung Menggunakan Medivault?
-          </h2>
+  <div className="rounded-[32px] border border-[#DDF3EC] bg-[#F5FCF9] px-8 py-10 text-center">
+    <h2 className="text-3xl font-black text-[#061B3A]">
+      Masih Bingung Menggunakan Medivault?
+    </h2>
 
-          <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600">
-            Jangan khawatir. Tim kami siap membantu apabila Anda mengalami
+    <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-slate-600">
+      Jangan khawatir. Tim kami siap membantu apabila Anda mengalami
             kendala saat menggunakan Medivault.
-          </p>
+    </p>
 
-          <a
-            href="/kontak"
-            className="mt-8 inline-flex items-center gap-3 rounded-full bg-[#0F766E] px-8 py-4 font-bold text-white shadow-lg transition hover:-translate-y-1 hover:bg-[#0C665F]"
-          >
-            Hubungi Kami
-            <ArrowRight size={18} />
-          </a>
-        </div>
-      </section>
+    <a
+      href="/kontak"
+      className="mt-7 inline-flex items-center rounded-full bg-[#0F766E] px-8 py-4 font-bold text-white shadow-md transition-all duration-300 hover:-translate-y-1 hover:bg-[#0C665F] hover:shadow-lg"
+    >
+      Hubungi Kami
+    </a>
+  </div>
+</section>
 
       <InfoCTA />
     </InfoLayout>

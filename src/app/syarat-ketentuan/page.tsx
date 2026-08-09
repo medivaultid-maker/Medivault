@@ -24,7 +24,7 @@ export default function SyaratKetentuanPage() {
       />
 
       {/* INTRO */}
-      <section className="mx-auto max-w-6xl px-6 py-16">
+      <section className="mx-auto max-w-6xl px-6 pt-4 pb-12">
         <div className="rounded-[32px] border border-[#E7F6F0] bg-white p-10 shadow-lg">
           <h2 className="text-3xl font-black text-[#061B3A]">
             Ketentuan Umum
@@ -41,7 +41,7 @@ export default function SyaratKetentuanPage() {
       </section>
 
       {/* RULES */}
-      <section className="mx-auto max-w-7xl px-6 pb-16">
+      <section className="mx-auto max-w-7xl px-6 pb-12">
         <div className="grid gap-8 lg:grid-cols-2">
 
           <div className="rounded-[32px] border border-[#E7F6F0] bg-white p-8 shadow-lg">
