@@ -13,8 +13,14 @@ import {
   Pencil,
   Trash2,
   X,
+  Sparkles,
+  FileText,
+  Upload,
+  Loader2,
+  Eye,
+  RefreshCw,
 } from "lucide-react";
-
+import mammoth from "mammoth";
 import { supabase } from "../../lib/supabase";
 
 type Material = {
@@ -26,6 +32,37 @@ type Material = {
   content_html: string | null;
   source_file: string | null;
   published: boolean;
+};
+
+type SummarySection = {
+  type:
+    | "concept"
+    | "key_points"
+    | "high_yield"
+    | "comparison"
+    | "mnemonic"
+    | "clinical_pearl"
+    | "algorithm"
+    | "image";
+
+  title: string;
+  content: string;
+  items: string[];
+  image_query: string;
+};
+
+type SummaryQuiz = {
+  question: string;
+  options: string[];
+  answer: string;
+  explanation: string;
+};
+
+type AISummary = {
+  title: string;
+  introduction: string;
+  sections: SummarySection[];
+  quick_quiz: SummaryQuiz[];
 };
 
 export default function AdminMateriPage() {
@@ -43,9 +80,142 @@ export default function AdminMateriPage() {
   const [published, setPublished] = useState(false);
   const [sourceFile, setSourceFile] = useState("");
 
+  const [selectedWordFile, setSelectedWordFile] =
+  useState<File | null>(null);
+
+const [generatingAI, setGeneratingAI] =
+  useState(false);
+
+const [aiSummary, setAISummary] =
+  useState<AISummary | null>(null);
+
+const [showAIPreview, setShowAIPreview] =
+  useState(false);
+
   useEffect(() => {
     fetchMaterials();
   }, []);
+
+  async function generateAISummary() {
+  if (!selectedWordFile) {
+    alert("Pilih file Word terlebih dahulu.");
+    return;
+  }
+
+  if (!selectedWordFile.name.toLowerCase().endsWith(".docx")) {
+    alert("File harus berformat .docx");
+    return;
+  }
+
+  try {
+    setGeneratingAI(true);
+
+    const arrayBuffer =
+      await selectedWordFile.arrayBuffer();
+
+    const result =
+      await mammoth.extractRawText({
+        arrayBuffer,
+      });
+
+    const extractedText =
+      result.value.trim();
+
+    if (!extractedText) {
+      alert("Isi Word tidak berhasil dibaca.");
+      return;
+    }
+
+    setSourceFile(selectedWordFile.name);
+
+    const response = await fetch(
+      "/api/generate-material-summary",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          text: extractedText,
+          title,
+          subject,
+        }),
+      }
+    );
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(
+        data.error ||
+          "Gagal membuat rangkuman AI."
+      );
+    }
+
+   setAISummary(data.summary);
+
+setTitle(
+  data.summary.title || title
+);
+
+// Masukkan hasil AI ke editor
+const generatedText = summaryToText(data.summary);
+
+if (editorRef.current) {
+  editorRef.current.innerHTML =
+    textToHtml(generatedText);
+}
+
+setShowAIPreview(true);
+
+  } catch (error) {
+    console.error(error);
+
+    alert(
+      error instanceof Error
+        ? error.message
+        : "Gagal membuat rangkuman AI."
+    );
+  } finally {
+    setGeneratingAI(false);
+  }
+}
+
+function summaryToText(
+  summary: AISummary
+) {
+  let text =
+    `${summary.title}\n\n`;
+
+  text +=
+    `${summary.introduction}\n\n`;
+
+  summary.sections.forEach(
+    (section) => {
+      text +=
+        `${section.title}\n`;
+
+      if (section.content) {
+        text +=
+          `${section.content}\n`;
+      }
+
+      if (section.items?.length) {
+        section.items.forEach(
+          (item) => {
+            text += `• ${item}\n`;
+          }
+        );
+      }
+
+      text += "\n";
+    }
+  );
+
+  return text;
+}
+
+
 
   async function fetchMaterials() {
     setLoading(true);
@@ -66,21 +236,25 @@ export default function AdminMateriPage() {
   }
 
   function openCreate() {
-    setEditingId(null);
-    setTitle("");
-    setSubject("Mikrobiologi");
-    setChapter("");
-    setPublished(false);
-    setSourceFile("");
+  setEditingId(null);
+  setTitle("");
+  setSubject("Mikrobiologi");
+  setChapter("");
+  setPublished(false);
+  setSourceFile("");
 
-    setShowEditor(true);
+  setSelectedWordFile(null);
+  setAISummary(null);
+  setShowAIPreview(false);
 
-    setTimeout(() => {
-      if (editorRef.current) {
-        editorRef.current.innerHTML = "";
-      }
-    }, 50);
-  }
+  setShowEditor(true);
+
+  setTimeout(() => {
+    if (editorRef.current) {
+      editorRef.current.innerHTML = "";
+    }
+  }, 50);
+}
 
   function openEdit(material: Material) {
     setEditingId(material.id);
@@ -188,14 +362,17 @@ console.log("SESSION:", session);
 console.log("USER:", session?.user);
 
     const materialData = {
-      title: title.trim(),
-      subject: subject.trim(),
-      chapter: Number(chapter),
-      content: plainText,
-      content_html: html,
-      source_file: sourceFile.trim() || null,
-      published,
-    };
+  title: title.trim(),
+  subject: subject.trim(),
+  chapter: Number(chapter),
+  content: plainText,
+  content_html: html,
+  source_file: sourceFile.trim() || null,
+  published,
+
+  ai_generated: !!aiSummary,
+  summary_json: aiSummary,
+};
 
     if (editingId) {
       const { data, error } = await supabase
@@ -459,6 +636,372 @@ console.log("ERROR INSERT:", error);
                   </div>
 
                 </div>
+
+                {/* AI GENERATOR */}
+
+<div className="rounded-[28px] border border-[#DDEFEA] bg-gradient-to-br from-[#F0FDFA] via-white to-[#F8FAFC] p-5">
+
+  <div className="flex items-start gap-4">
+
+    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#0F766E] text-white">
+      <Sparkles size={22} />
+    </div>
+
+    <div>
+      <h3 className="font-black text-[#061B3A]">
+        Generate Rangkuman dengan AI
+      </h3>
+
+      <p className="mt-1 text-sm leading-6 text-slate-500">
+        Upload materi Word dan MediVault akan
+        mengubahnya menjadi rangkuman yang
+        lebih visual, ringkas, dan mudah dipelajari.
+      </p>
+    </div>
+
+  </div>
+
+  <label className="mt-5 block cursor-pointer">
+
+    <input
+      type="file"
+      accept=".docx"
+      className="hidden"
+      onChange={(e) => {
+        const file =
+          e.target.files?.[0] || null;
+
+        setSelectedWordFile(file);
+
+        if (file) {
+          setSourceFile(file.name);
+        }
+      }}
+    />
+
+    <div className="rounded-2xl border-2 border-dashed border-[#B8DED6] bg-white p-7 text-center transition hover:border-[#0F766E] hover:bg-[#F8FFFD]">
+
+      {selectedWordFile ? (
+        <>
+          <FileText
+            size={34}
+            className="mx-auto text-[#0F766E]"
+          />
+
+          <p className="mt-3 font-bold text-slate-800">
+            {selectedWordFile.name}
+          </p>
+
+          <p className="mt-1 text-xs text-slate-400">
+            {(selectedWordFile.size / 1024 / 1024).toFixed(2)} MB
+          </p>
+        </>
+      ) : (
+        <>
+          <Upload
+            size={34}
+            className="mx-auto text-slate-400"
+          />
+
+          <p className="mt-3 font-bold text-slate-700">
+            Pilih file Word
+          </p>
+
+          <p className="mt-1 text-sm text-slate-400">
+            Format .docx
+          </p>
+        </>
+      )}
+
+    </div>
+
+  </label>
+
+  <button
+    type="button"
+    onClick={generateAISummary}
+    disabled={
+      generatingAI ||
+      !selectedWordFile
+    }
+    className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-2xl bg-[#0F766E] px-5 py-3.5 font-black text-white transition hover:bg-[#115E59] disabled:cursor-not-allowed disabled:opacity-50"
+  >
+
+    {generatingAI ? (
+      <>
+        <Loader2
+          size={19}
+          className="animate-spin"
+        />
+
+        Sedang membuat rangkuman...
+      </>
+    ) : (
+      <>
+        <Sparkles size={19} />
+
+        Generate Rangkuman AI
+      </>
+    )}
+
+  </button>
+
+</div>
+
+{aiSummary && (
+  <div className="rounded-[28px] border border-slate-200 bg-white p-5 shadow-sm">
+
+    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+
+      <div>
+        <div className="flex items-center gap-2">
+
+          <Sparkles
+            size={18}
+            className="text-[#0F766E]"
+          />
+
+          <h3 className="font-black text-[#061B3A]">
+            Rangkuman AI berhasil dibuat
+          </h3>
+
+        </div>
+
+        <p className="mt-1 text-sm text-slate-500">
+          {aiSummary.sections.length} bagian
+          materi berhasil dibuat.
+        </p>
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+
+        <button
+          type="button"
+          onClick={() =>
+            setShowAIPreview(true)
+          }
+          className="inline-flex items-center gap-2 rounded-xl border border-slate-200 px-4 py-2 text-sm font-bold text-slate-700 hover:bg-slate-50"
+        >
+          <Eye size={16} />
+          Preview
+        </button>
+
+        <button
+          type="button"
+          onClick={generateAISummary}
+          className="inline-flex items-center gap-2 rounded-xl border border-[#DDEFEA] px-4 py-2 text-sm font-bold text-[#0F766E] hover:bg-[#F0FDFA]"
+        >
+          <RefreshCw size={16} />
+          Generate Ulang
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+)}
+
+{showAIPreview && aiSummary && (
+  <div className="fixed inset-0 z-[60] overflow-y-auto bg-black/50 p-4 md:p-8">
+
+    <div className="mx-auto max-w-5xl rounded-[32px] bg-slate-50 shadow-2xl">
+
+      {/* HEADER */}
+
+      <div className="sticky top-0 z-10 flex items-center justify-between rounded-t-[32px] border-b border-slate-100 bg-white p-5">
+
+        <div>
+          <p className="text-xs font-black uppercase tracking-wider text-[#0F766E]">
+            AI Preview
+          </p>
+
+          <h2 className="mt-1 text-xl font-black text-[#061B3A]">
+            {aiSummary.title}
+          </h2>
+        </div>
+
+        <button
+          onClick={() =>
+            setShowAIPreview(false)
+          }
+          className="rounded-xl p-2 text-slate-400 hover:bg-slate-100"
+        >
+          <X size={22} />
+        </button>
+
+      </div>
+
+      {/* CONTENT */}
+
+      <div className="space-y-5 p-5 md:p-8">
+
+        {/* INTRO */}
+
+        <div className="rounded-[28px] bg-white p-6 shadow-sm">
+
+          <div className="mb-3 flex items-center gap-2">
+
+            <span className="rounded-xl bg-[#E6FFFA] px-3 py-1 text-sm font-black text-[#0F766E]">
+              🧠 KONSEP DASAR
+            </span>
+
+          </div>
+
+          <p className="leading-8 text-slate-700">
+            {aiSummary.introduction}
+          </p>
+
+        </div>
+
+        {/* SECTIONS */}
+
+        {aiSummary.sections.map(
+          (section, index) => {
+
+            const isHighYield =
+              section.type === "high_yield";
+
+            const isMnemonic =
+              section.type === "mnemonic";
+
+            const isPearl =
+              section.type ===
+              "clinical_pearl";
+
+            return (
+              <div
+                key={index}
+                className={`rounded-[28px] p-6 shadow-sm ${
+                  isHighYield
+                    ? "border border-amber-200 bg-amber-50"
+                    : isMnemonic
+                    ? "border border-violet-200 bg-violet-50"
+                    : isPearl
+                    ? "border border-rose-200 bg-rose-50"
+                    : "bg-white"
+                }`}
+              >
+
+                <h3 className="text-lg font-black text-[#061B3A]">
+                  {isHighYield
+                    ? "⭐ "
+                    : isMnemonic
+                    ? "💡 "
+                    : isPearl
+                    ? "🩺 "
+                    : "📌 "}
+
+                  {section.title}
+                </h3>
+
+                {section.content && (
+                  <p className="mt-3 whitespace-pre-line leading-8 text-slate-700">
+                    {section.content}
+                  </p>
+                )}
+
+                {section.items?.length > 0 && (
+                  <ul className="mt-4 space-y-2">
+
+                    {section.items.map(
+                      (item, itemIndex) => (
+                        <li
+                          key={itemIndex}
+                          className="flex gap-3 leading-7 text-slate-700"
+                        >
+                          <span className="mt-2 h-2 w-2 shrink-0 rounded-full bg-[#0F766E]" />
+
+                          <span>
+                            {item}
+                          </span>
+                        </li>
+                      )
+                    )}
+
+                  </ul>
+                )}
+
+                {section.type === "image" &&
+                  section.image_query && (
+                    <div className="mt-4 rounded-2xl border border-dashed border-slate-300 bg-slate-50 p-5">
+
+                      <p className="text-xs font-bold uppercase tracking-wide text-slate-400">
+                        Visual yang disarankan
+                      </p>
+
+                      <p className="mt-2 font-bold text-slate-700">
+                        {section.image_query}
+                      </p>
+
+                    </div>
+                  )}
+
+              </div>
+            );
+          }
+        )}
+
+        {/* QUIZ */}
+
+        {aiSummary.quick_quiz.length > 0 && (
+          <div className="rounded-[28px] bg-[#061B3A] p-6 text-white">
+
+            <p className="text-sm font-black uppercase tracking-wider text-[#7DE3D5]">
+              Quick Quiz
+            </p>
+
+            <h3 className="mt-2 text-xl font-black">
+              Uji pemahamanmu
+            </h3>
+
+            <div className="mt-5 space-y-5">
+
+              {aiSummary.quick_quiz.map(
+                (quiz, index) => (
+                  <div
+                    key={index}
+                    className="rounded-2xl bg-white/10 p-5"
+                  >
+
+                    <p className="font-bold leading-7">
+                      {index + 1}.{" "}
+                      {quiz.question}
+                    </p>
+
+                    <div className="mt-3 space-y-2">
+
+                      {quiz.options.map(
+                        (option, optionIndex) => (
+                          <div
+                            key={optionIndex}
+                            className="rounded-xl bg-white/10 px-4 py-2 text-sm"
+                          >
+                            {String.fromCharCode(
+                              65 + optionIndex
+                            )}
+                            . {option}
+                          </div>
+                        )
+                      )}
+
+                    </div>
+
+                  </div>
+                )
+              )}
+
+            </div>
+
+          </div>
+        )}
+
+      </div>
+
+    </div>
+
+  </div>
+)}
 
                 {/* SOURCE */}
                 <div>
