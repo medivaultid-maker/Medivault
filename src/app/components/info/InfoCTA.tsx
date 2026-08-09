@@ -20,8 +20,8 @@ export default function InfoCTA() {
         </h2>
 
         <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-white/80">
-  Ribuan soal latihan, pembahasan lengkap,
-  dan simulasi CBT siap membantu perjalananmu
+  Ribuan soal latihan dan pembahasan lengkap
+  yang siap membantu perjalananmu
   menjadi dokter yang kompeten.
 </p>
 

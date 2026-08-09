@@ -117,7 +117,6 @@ const loginGoogle = async () => {
   }}
 />
           <div style={styles.header}>
-            <p style={styles.badge}>Login</p>
             <h1 style={styles.title}>Masuk ke Medivault Exam</h1>
           </div>
 
@@ -213,14 +212,14 @@ const loginGoogle = async () => {
 
 const styles: Record<string, CSSProperties> = {
   page: {
-    minHeight: "100vh",
-    background:
-"radial-gradient(circle at top left,#EEF6F3 0%,#F8FAFC 35%,#FFFFFF 100%)",
-    padding: "60px 24px",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "flex-start",
-  },
+  minHeight: "100vh",
+  background:
+    "radial-gradient(circle at top left,#EEF6F3 0%,#F8FAFC 35%,#FFFFFF 100%)",
+  padding: "24px 24px",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "flex-start",
+},
 
   card: {
     position: "relative",

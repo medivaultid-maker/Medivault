@@ -15,10 +15,11 @@ import {
 
 const materials = [
   {
-    icon: <BookOpen size={30} />,
-    title: "Ebook Kedokteran",
-    desc: "Kumpulan ebook pembelajaran kedokteran untuk membantu memahami konsep dasar hingga klinis.",
-  },
+  icon: <BookOpen size={32} />,
+  title: "Ebook Kedokteran",
+  desc: "Kumpulan ebook kedokteran yang ringkas dan sistematis.",
+  href: "/materi/ebook",
+},
   {
     icon: <FileText size={30} />,
     title: "Catatan Materi",
@@ -26,9 +27,15 @@ const materials = [
     href: "/materi/catatan",
   },
   {
+  icon: <Microscope size={30} />,
+  title: "Flashcard Ujian",
+  desc: "Kartu belajar singkat untuk mengingat konsep dan poin penting sebelum ujian.",
+  href: "/materi/flashcard",
+},
+  {
     icon: <Microscope size={30} />,
-    title: "Atlas Anatomi & Histologi",
-    desc: "Kumpulan gambar dan pembahasan anatomi, histologi, serta preparat praktikum.",
+    title: "Atlas Histologi",
+    desc: "Kumpulan gambar dan pembahasan histologi, serta preparat praktikum.",
   },
   {
     icon: <Stethoscope size={30} />,
@@ -54,11 +61,11 @@ export default function MateriPage() {
       />
 
 
-      <section className="mx-auto max-w-7xl px-6 py-16">
+      <section className="mx-auto max-w-7xl px-6 pt-0 pb-10">
 
-        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
 
-          {materials.map((item) => {
+    {materials.map((item) => {
   const card = (
     <div
       className="rounded-[32px] border border-[#E7F6F0] bg-white p-8 shadow-lg transition hover:-translate-y-2 hover:shadow-xl"

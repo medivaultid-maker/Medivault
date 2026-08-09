@@ -22,7 +22,7 @@ export default function InfoHero({
         initial={{ opacity: 0, y: 25 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: .6 }}
-        className="relative mx-auto max-w-6xl overflow-hidden rounded-[38px] border border-white/70 bg-white/80 p-12 shadow-[0_35px_90px_rgba(6,27,58,.08)] backdrop-blur"
+        className="relative mx-auto max-w-6xl overflow-hidden rounded-[38px] border border-white/70 bg-white/80 px-8 py-8 md:px-12 md:py-9 shadow-[0_35px_90px_rgba(6,27,58,.08)] backdrop-blur"
       >
 
         {/* Blur */}
@@ -32,19 +32,7 @@ export default function InfoHero({
 
         <div className="relative">
 
-          <div className="mb-8 flex justify-center">
-
-            <span className="inline-flex items-center gap-2 rounded-full bg-[#ECFDF5] px-5 py-2 text-sm font-bold text-[#0F766E]">
-
-              <ShieldCheck size={16}/>
-
-              Trusted Medical Learning Platform
-
-            </span>
-
-          </div>
-
-          <div className="mb-8 flex justify-center">
+          <div className="mb-5 flex justify-center">
 
             <div className="relative">
 
@@ -68,7 +56,7 @@ export default function InfoHero({
 
             </h1>
 
-            <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-slate-600">
+            <p className="mx-auto mt-4 max-w-2xl text-lg leading-8 text-slate-600">
 
               {subtitle}
 
@@ -76,11 +64,11 @@ export default function InfoHero({
 
             <div className="mt-8 font-semibold text-[#234F42]">
 
-              🩺 Dibangun untuk Mahasiswa Kedokteran Indonesia
+              
 
             </div>
 
-            <div className="mt-8 text-sm text-slate-500">
+            <div className="mt-5 text-sm text-slate-500">
 
               <Link href="/">Beranda</Link>
 

@@ -5,16 +5,11 @@ import { useState } from "react";
 import Link from "next/link";
 import Navbar from "./components/Navbar";
 import {
-  FileCheck2,
-  BarChart3,
-  CreditCard,
-  LayoutDashboard,
   User,
   Microscope,
   Stethoscope,
   Trophy,
   CheckCircle2,
-  ArrowRight,
   Send,
 } from "lucide-react";
 import { motion, useScroll, useTransform } from "framer-motion";
@@ -109,52 +104,21 @@ const handleSubscribe = async () => {
   const yBg2 = useTransform(scrollY, [0, 300], [0, -100]);
   const yHero = useTransform(scrollY, [0, 300], [0, -35]);
 
-  const features = [
-  {
-    icon: <FileCheck2 size={24} />,
-    title: "Simulasi CBT & Praktikum",
-    desc: "Latihan soal CBT dan praktikum dengan tampilan yang menyerupai ujian.",
-    iconStyle: "bg-[#DDFBEF] text-[#0F766E]",
-    arrowStyle: "bg-[#DDFBEF] text-[#0F766E]",
-  },
-  {
-    icon: <BarChart3 size={24} />,
-    title: "Skor & Pembahasan",
-    desc: "Lihat nilai, pembahasan, dan evaluasi setelah menyelesaikan latihan.",
-    iconStyle: "bg-[#EEF6F3] text-[#234F42]",
-  arrowStyle: "bg-[#EEF6F3] text-[#234F42]",
-  },
-  {
-    icon: <CreditCard size={24} />,
-    title: "Akses Latihan",
-    desc: "Pilih paket akses sesuai kebutuhan untuk mulai mengerjakan latihan soal.",
-    iconStyle: "bg-[#DDF8FF] text-[#06A6C9]",
-    arrowStyle: "bg-[#DDF8FF] text-[#06A6C9]",
-  },
-  {
-    icon: <LayoutDashboard size={24} />,
-    title: "Dashboard Belajar",
-    desc: "Lihat riwayat latihan, skor, dan perkembangan belajarmu.",
-    iconStyle: "bg-[#F8F5E8] text-[#D4AF37]",
-  arrowStyle: "bg-[#F8F5E8] text-[#D4AF37]",
-  },
-];
-
   const stats = [
     {
       label: "Modul Pembelajaran",
       value: "120+",
-      desc: "Materi pembelajaran yang disusun secara ringkas dan sistematis.",
+      desc: "Materi pembelajaran disusun ringkas dan sistematis.",
     },
     {
       label: "Simulasi Ujian",
       value: "CBT & Praktikum",
-      desc: "Simulasi ujian dengan timer, penilaian otomatis, dan pembahasan soal.",
+      desc: "Simulasi dengan timer, penilaian otomatis, dan pembahasan soal.",
     },
     {
-      label: "Perkembangan Belajar",
+      label: "Hasil Belajar",
       value: "Real-time",
-      desc: "Lihat perkembangan hasil belajar dari setiap latihan yang dikerjakan.",
+      desc: "Pantau perkembangan belajar dari setiap latihan.",
     },
   ];
 
@@ -163,7 +127,7 @@ const handleSubscribe = async () => {
       <Navbar />
 
       {/* HERO */}
-      <section className="relative overflow-hidden px-6 pt-8 pb-20 md:px-12 md:pt-12 md:pb-24">
+      <section className="relative overflow-hidden px-6 pt-8 pb-20 md:px-12 md:pt-12 md:pb-12">
         <motion.div
           style={{ y: yBg1 }}
           className="pointer-events-none absolute -top-28 -left-28 h-80 w-80 rounded-full bg-[#234F42]/10 blur-3xl"
@@ -183,11 +147,6 @@ const handleSubscribe = async () => {
         >
           {/* HERO LEFT */}
           <div className="flex-1 text-left">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#D4AF37]/30 bg-white/80 px-5 py-2 text-sm font-bold text-[#061B3A] shadow-sm backdrop-blur">
-              <Stethoscope size={16} className="text-[#0F766E]" />
-              CBT • Materi • Dashboard Belajar
-            </div>
-
             <h1 className="max-w-3xl text-4xl font-extrabold leading-tight tracking-tight text-[#061B3A] md:text-6xl">
               Persiapan Ujian
               <br />
@@ -334,7 +293,7 @@ text-[#234F42]">
       </section>
 
       {/* STATS */}
-      <section className="px-6 pb-20 md:px-12">
+<section id="fitur" className="px-6 pb-10 md:px-12">
         <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-3">
           {stats.map((item, i) => (
             <motion.div
@@ -371,84 +330,22 @@ text-[#234F42]">
         </div>
       </section>
 
-      {/* FITUR */}
-<section id="fitur" className="px-6 pb-28 md:px-12">
-  <motion.div
-    initial={{ opacity: 0, y: 28 }}
-    whileInView={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.6 }}
-    viewport={{ once: true }}
-    className="mx-auto mb-14 max-w-4xl text-center"
-  >
-    <div className="mx-auto mb-4 inline-flex items-center gap-2 rounded-full bg-[#DDFBEF] px-4 py-2 text-sm font-extrabold uppercase tracking-tight text-[#0F766E]">
-      <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#0F766E] text-white">
-        <CheckCircle2 size={12} />
-      </span>
-      Fitur Utama
-    </div>
-
-    <h2 className="text-3xl font-black leading-tight tracking-[-0.04em] text-[#061B3A] md:text-4xl">
-      Semua yang Dibutuhkan untuk Persiapan Ujian
-    </h2>
-
-    <p className="mt-4 text-base font-medium leading-7 text-slate-500 md:text-lg">
-      Belajar, berlatih, dan memantau perkembangan dalam satu platform.
-    </p>
-  </motion.div>
-
-  <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-2 xl:grid-cols-4">
-    {features.map((item, i) => (
-      <motion.div
-        key={i}
-        initial={{ opacity: 0, y: 35 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ delay: i * 0.12, duration: 0.5 }}
-        viewport={{ once: true }}
-        className="group flex min-h-[270px] flex-col rounded-[26px] border border-slate-200/70 bg-white p-6 shadow-[0_14px_40px_rgba(6,27,58,0.06)] transition hover:-translate-y-1 hover:shadow-[0_24px_65px_rgba(6,27,58,0.11)]"
-      >
-        <div
-          className={`mb-5 flex h-[58px] w-[58px] items-center justify-center rounded-[16px] ${item.iconStyle}`}
-        >
-          {item.icon}
-        </div>
-
-        <h3 className="min-h-[56px] text-[19px] font-black leading-[1.35] tracking-[-0.03em] text-[#061B3A]">
-          {item.title}
-        </h3>
-
-        <p className="mt-3 min-h-[88px] text-[15px] font-medium leading-7 text-slate-500">
-          {item.desc}
-        </p>
-
-        <div className="mt-auto flex justify-end">
-          <Link
-            href="/simulasi"
-            className={`flex h-10 w-10 items-center justify-center rounded-full transition group-hover:scale-110 ${item.arrowStyle}`}
-          >
-            <ArrowRight size={18} />
-          </Link>
-        </div>
-      </motion.div>
-    ))}
-  </div>
-</section>
-
       {/* CTA */}
-      <section className="px-6 pb-28 md:px-12">
+      <section className="px-6 pb-16 md:px-12">
         <div className="mx-auto max-w-7xl overflow-hidden rounded-[36px] bg-[#0A1733] p-8 shadow-[0_30px_90px_rgba(6,27,58,0.22)] md:p-12">
           <div className="grid gap-8 md:grid-cols-[1.4fr_0.6fr] md:items-center">
             <div>
               <p className="mb-3 text-sm font-bold uppercase tracking-[0.24em] text-[#BFC7D5]">
-                Catatan Kedokteran
-              </p>
+  Catatan Kedokteran
+</p>
 
-              <h2 className="max-w-3xl text-3xl font-extrabold leading-tight text-white md:text-4xl">
-                Akses Semua Materi Kedokteran dalam Satu Platform
-              </h2>
+<h2 className="max-w-3xl text-3xl font-extrabold leading-tight text-white md:text-4xl">
+  Akses Semua Materi Kedokteran dalam Satu Platform
+</h2>
 
-              <p className="mt-4 max-w-2xl text-base font-medium leading-7 text-white/70">
-                Temukan ebook, rangkuman blok, atlas anatomi, histologi, catatan praktikum, dan materi pendukung lainnya dalam satu platform.
-              </p>
+<p className="mt-4 max-w-2xl text-base font-medium leading-7 text-white/70">
+  Ebook, rangkuman blok, atlas, dan materi pendukung lainnya.
+</p>
             </div>
 
             <div className="flex md:justify-end">
@@ -468,21 +365,19 @@ text-[#234F42]">
         <div className="mx-auto max-w-7xl px-6 md:px-10">
           <div className="grid gap-10 md:grid-cols-[1.4fr_0.8fr_0.8fr_0.9fr_1.4fr]">
             
-            {/* BRAND */}
-            <div>
-              <div className="flex items-center gap-3">
-                <img
-                  src="/LOGO_MEDIVAULT.png"
-                  alt="Medivault Exam"
-                  className="h-11 w-11 auto object-contain"
-                />
-              </div>
+{/* BRAND */}
+<div className="self-start">
+ <img
+  src="/LOGO_MEDIVAULT.png"
+  alt="Medivault Exam"
+  className="h-12 w-12 object-contain -translate-y-3"
+/>
 
-              <p className="mt-5 max-w-xs text-sm font-medium leading-6 text-slate-500">
-                Platform latihan soal kedokteran yang membantu mahasiswa belajar lebih terarah dan siap menghadapi ujian.
-              </p>
+  <p className="mt-0 max-w-xs text-sm font-medium leading-6 text-slate-500">
+    Platform latihan soal kedokteran untuk belajar lebih terarah.
+  </p>
 
-              <div className="mt-5 flex items-center gap-3">
+  <div className="mt-4 flex items-center gap-3">
   <a
     href="https://www.instagram.com/medivault.id/"
     target="_blank"
@@ -625,7 +520,7 @@ text-[#234F42]">
               </h3>
 
               <p className="mb-4 max-w-xs text-sm font-medium leading-6 text-slate-500">
-                Dapatkan informasi fitur terbaru dan konten belajar langsung melalui email.
+                Dapatkan informasi terbaru langsung melalui email.
               </p>
 
               <div className="flex flex-col gap-3">

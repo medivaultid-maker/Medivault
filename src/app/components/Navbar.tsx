@@ -84,11 +84,11 @@ setLoadingRole(false);
 };
 
   const publicLinks: NavItem[] = [
-    { label: "Beranda", href: "/" },
-    { label: "Fitur", href: "/#fitur" },
-    { label: "Simulasi", href: "/simulasi" },
-    { label: "Akses Latihan", href: "/token" },
-  ];
+  { label: "Beranda", href: "/" },
+  { label: "Simulasi", href: "/simulasi" },
+  { label: "Akses Latihan", href: "/token" },
+  { label: "Materi Kedokteran", href: "/materi" },
+];
 
   const adminLinks: NavItem[] = [
     { label: "Admin Panel", href: "/admin" },
@@ -105,11 +105,12 @@ setLoadingRole(false);
         { label: "Verifikasi Pembayaran", href: "/admin/payment" },
       ]
     : isLoggedIn
-    ? [
-        { label: "Dashboard Belajar", href: "/dashboard" },
-        { label: "Simulasi", href: "/simulasi" },
-        { label: "Akses Latihan", href: "/token" },
-      ]
+? [
+    { label: "Dashboard Belajar", href: "/dashboard" },
+    { label: "Simulasi", href: "/simulasi" },
+    { label: "Akses Latihan", href: "/token" },
+    { label: "Materi Kedokteran", href: "/materi" },
+  ]
     : publicLinks;
 
     if (loadingRole) {

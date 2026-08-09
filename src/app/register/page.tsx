@@ -122,7 +122,7 @@ setTimeout(() => {
     <main>
       <Navbar />
 
-      <section className="min-h-screen flex items-center justify-center px-6 py-16 bg-[radial-gradient(circle_at_top_left,#EEF6F3_0%,#F8FAFC_35%,#FFFFFF_100%)]">
+      <section className="min-h-screen flex items-start justify-center px-6 pt-8 pb-16 bg-[radial-gradient(circle_at_top_left,#EEF6F3_0%,#F8FAFC_35%,#FFFFFF_100%)]">
 
   <div className="w-full max-w-xl rounded-[28px] border border-slate-200 bg-white p-8 shadow-[0_24px_70px_rgba(6,27,58,0.08)] animate-[fadeUp_0.6s_ease] relative overflow-hidden">
     <div className="absolute -top-16 -right-16 h-40 w-40 rounded-full bg-[#234F42]/5 blur-3xl" />
@@ -141,18 +141,14 @@ setTimeout(() => {
 
           {/* HEADER */}
           <div className="text-center mb-8">
-            <div className="inline-block px-4 py-2 rounded-full bg-[#EEF6F3] text-[#234F42] border border-[#DCE5E0] font-bold text-sm mb-4">
-              Daftar
-            </div>
+  <h1 className="text-3xl font-extrabold text-[#061B3A]">
+    Daftar Akun Baru
+  </h1>
 
-            <h1 className="text-3xl font-extrabold text-[#061B3A]">
-              Daftar Akun Baru
-            </h1>
-
-            <p className="text-slate-500 mt-2 text-sm">
-              Buat akun untuk mulai latihan dan pantau progres kamu.
-            </p>
-          </div>
+  <p className="text-slate-500 mt-2 text-sm">
+    Buat akun untuk mulai latihan.
+  </p>
+</div>
 
           {/* FORM */}
           <div className="flex flex-col gap-4">
@@ -175,12 +171,7 @@ setTimeout(() => {
               {loading ? "Memproses..." : "Daftar Sekarang"}
             </button>
 
-            <button
-              onClick={() => alert("Google belum tersedia")}
-              className="py-4 rounded-2xl border font-bold hover:bg-slate-50 transition"
-            >
-              Daftar dengan Google
-            </button>
+            
 
           </div>
 

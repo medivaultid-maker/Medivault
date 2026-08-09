@@ -1,3 +1,4 @@
+
 import Link from "next/link";
 import InfoLayout from "../../../components/info/InfoLayout";
 import InfoHero from "../../../components/info/InfoHero";
@@ -8,13 +9,13 @@ import {
   ShoppingCart,
 } from "lucide-react";
 
-export default function MikrobiologiPage() {
+export default function AnatomiPage() {
   return (
     <InfoLayout>
 
       <InfoHero
-        title="Mikrobiologi"
-        subtitle="Rangkuman materi mikrobiologi yang disusun per bab untuk membantu memahami konsep penting dengan lebih mudah."
+        title="Anatomi"
+        subtitle="Rangkuman materi anatomi yang disusun per bab untuk membantu memahami struktur tubuh manusia dengan lebih mudah."
         icon={<BookOpen size={40} />}
       />
 
@@ -26,8 +27,8 @@ export default function MikrobiologiPage() {
             {/* PREVIEW */}
             <div className="overflow-hidden rounded-[24px] border border-slate-100 bg-slate-50">
               <img
-                src="/images/flashcard-mikrobiologi-preview.png"
-                alt="Preview Flashcard Mikrobiologi"
+                src="/images/anatomi-preview.png"
+                alt="Preview Catatan Materi Anatomi"
                 className="w-full object-cover"
               />
             </div>
@@ -36,14 +37,15 @@ export default function MikrobiologiPage() {
             <div className="mt-10">
 
               <h2 className="text-2xl font-black text-[#061B3A]">
-  Catatan Materi — Mikrobiologi
-</h2>
+                Catatan Materi — Anatomi
+              </h2>
 
               <p className="mt-4 leading-7 text-slate-600">
-  Catatan materi Mikrobiologi yang merangkum berbagai konsep penting,
-  karakteristik mikroorganisme, serta materi klinis secara ringkas dan
-  sistematis untuk membantu proses belajar dan persiapan ujian.
-</p>
+                Catatan materi Anatomi yang merangkum berbagai struktur tubuh
+                manusia, hubungan antarorgan, serta konsep anatomi penting
+                secara ringkas dan sistematis untuk membantu proses belajar
+                dan persiapan ujian.
+              </p>
 
               {/* BENEFITS */}
               <div className="mt-8 space-y-4">
@@ -66,7 +68,7 @@ export default function MikrobiologiPage() {
                   />
 
                   <p className="text-slate-600">
-                    Rangkuman konsep penting mikrobiologi secara ringkas
+                    Rangkuman struktur dan konsep anatomi secara ringkas
                   </p>
                 </div>
 
@@ -77,7 +79,7 @@ export default function MikrobiologiPage() {
                   />
 
                   <p className="text-slate-600">
-                    Membantu belajar dan mengulang materi sebelum ujian
+                    Membantu memahami anatomi tubuh dan mengulang materi sebelum ujian
                   </p>
                 </div>
 
@@ -105,7 +107,7 @@ export default function MikrobiologiPage() {
                     className="inline-flex items-center justify-center gap-2 rounded-2xl bg-[#0F766E] px-7 py-4 font-extrabold text-white shadow-[0_18px_40px_rgba(15,118,110,0.18)] transition hover:-translate-y-0.5 hover:bg-[#0D665F]"
                   >
                     <ShoppingCart size={19} />
-                    Beli Flashcard
+                    Beli Catatan
                   </Link>
 
                 </div>
@@ -122,3 +124,4 @@ export default function MikrobiologiPage() {
     </InfoLayout>
   );
 }
+

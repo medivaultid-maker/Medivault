@@ -33,7 +33,7 @@ const subjects = [
   description:
     "Rangkuman materi fisiologi manusia mulai dari konsep dasar hingga berbagai sistem organ.",
   icon: <HeartPulse size={30} />,
-  total: 17,
+  total: 0,
   href: "/materi/catatan/fisiologi",
 },
 {
@@ -41,7 +41,7 @@ const subjects = [
     description:
       "Rangkuman materi mikrobiologi mulai dari dasar mikroorganisme hingga berbagai infeksi klinis.",
     icon: <Microscope size={30} />,
-    total: 14,
+    total: 0,
     href: "/materi/catatan/mikrobiologi",
   },
   {
@@ -63,26 +63,9 @@ export default function CatatanMateriPage() {
         icon={<BookOpen size={40} />}
       />
 
-      <section className="mx-auto max-w-7xl px-6 py-16">
-        <Link
-          href="/materi"
-          className="mb-8 inline-flex items-center gap-2 text-sm font-bold text-[#0F766E] hover:underline"
-        >
-          <ArrowLeft size={18} />
-          Kembali ke Materi
-        </Link>
+     <section className="mx-auto max-w-7xl px-6 pt-0 pb-10">
 
-        <div className="mb-10">
-          <h2 className="text-3xl font-black text-[#061B3A]">
-            Pilih Materi
-          </h2>
-
-          <p className="mt-3 text-slate-600">
-            Pilih bagian materi untuk melihat daftar bab yang tersedia.
-          </p>
-        </div>
-
-        <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+  <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {subjects.map((subject) => {
             const isAvailable = subject.total > 0;
 
