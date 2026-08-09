@@ -214,8 +214,7 @@ setAiReport(report);
       </h1>
 
       <p className="mt-4 max-w-xl text-white/80 leading-7">
-        Pantau perkembangan belajar, analisis kemampuan,
-        dan rekomendasi belajar otomatis dari Medivault AI.
+        Pantau perkembangan belajar, analisis kemampuan, dan rekomendasi belajar otomatis dari Medivault.
       </p>
 
     </div>
@@ -236,7 +235,7 @@ to-sky-50 p-6 shadow-sm">
 
 
 <h2 className="text-2xl font-extrabold text-[#061B3A]">
-🤖 AI Learning Dashboard
+🤖 Learning Dashboard
 </h2>
 
 
@@ -396,7 +395,7 @@ to-teal-50 p-6 shadow-sm">
 
 
 <h2 className="text-2xl font-extrabold text-[#061B3A]">
-📚 Rekomendasi Belajar AI
+📚 Rekomendasi Belajar 
 </h2>
 
 

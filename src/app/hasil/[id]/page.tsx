@@ -248,7 +248,7 @@ text-xl
 font-extrabold
 text-[#061B3A]
 ">
-🤖 AI Learning Report
+🤖 Learning Report
 </h2>
 
 

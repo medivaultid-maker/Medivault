@@ -104,7 +104,7 @@ return(
 
 
 <h1 className="text-3xl font-extrabold text-[#061B3A]">
-🤖 AI Learning Dashboard
+🤖 Learning Dashboard
 </h1>
 
 

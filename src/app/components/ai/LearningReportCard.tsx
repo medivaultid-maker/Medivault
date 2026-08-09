@@ -74,7 +74,7 @@ export default function LearningReportCard({
   }}
   className="mt-5 rounded-xl bg-[#061B3A] px-5 py-3 font-bold text-white transition hover:opacity-90"
 >
-  Mulai Latihan AI
+  Mulai Latihan 
 </button>
       </div>
     </div>

@@ -83,7 +83,7 @@ const [packages, setPackages] = useState<any[]>([]);
   <div style={styles.heroLeft}>
 
     <div style={styles.aiBadge}>
-      🤖 AI Adaptive Learning
+      🤖 Adaptive Learning
     </div>
 
     <h2 style={styles.heroTitle}>
@@ -108,7 +108,7 @@ const [packages, setPackages] = useState<any[]>([]);
         }}
         style={styles.aiButton}
       >
-        🚀 Mulai Latihan AI
+        🚀 Mulai Latihan 
       </button>
     )}
 
