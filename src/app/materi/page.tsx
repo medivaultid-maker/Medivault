@@ -47,6 +47,12 @@ const materials = [
     title: "Ringkasan UKMPPD",
     desc: "Materi ringkas dan poin penting untuk membantu persiapan ujian kompetensi dokter.",
   },
+  {
+  icon: <Layers size={32} />,
+  title: "Flashcard UKMPPD",
+  desc: "Flashcard khusus untuk membantu review konsep dan materi penting dalam persiapan ujian kompetensi dokter.",
+  href: "/materi/flashcard/ukmppd",
+},
 ];
 
 

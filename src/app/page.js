@@ -106,19 +106,14 @@ const handleSubscribe = async () => {
 
   const stats = [
     {
-      label: "Modul Pembelajaran",
-      value: "120+",
-      desc: "Materi pembelajaran disusun ringkas dan sistematis.",
-    },
-    {
       label: "Simulasi Ujian",
       value: "CBT & Praktikum",
-      desc: "Simulasi dengan timer, penilaian otomatis, dan pembahasan soal.",
+      desc: "Latihan dengan timer, penilaian otomatis, dan pembahasan soal.",
     },
     {
-      label: "Hasil Belajar",
+      label: "Pantau Perkembangan",
       value: "Real-time",
-      desc: "Pantau perkembangan belajar dari setiap latihan.",
+      desc: "Lihat hasil latihan dan perkembangan belajarmu dari waktu ke waktu.",
     },
   ];
 
@@ -127,7 +122,7 @@ const handleSubscribe = async () => {
       <Navbar />
 
       {/* HERO */}
-      <section className="relative overflow-hidden px-6 pt-8 pb-20 md:px-12 md:pt-12 md:pb-12">
+      <section className="relative overflow-hidden px-6 pt-8 5 md:px-12 md:pt-12 md:pb-0">
         <motion.div
           style={{ y: yBg1 }}
           className="pointer-events-none absolute -top-28 -left-28 h-80 w-80 rounded-full bg-[#234F42]/10 blur-3xl"
@@ -148,15 +143,15 @@ const handleSubscribe = async () => {
           {/* HERO LEFT */}
           <div className="flex-1 text-left">
             <h1 className="max-w-3xl text-4xl font-extrabold leading-tight tracking-tight text-[#061B3A] md:text-6xl">
-              Persiapan Ujian
+              Sudah Belajar Banyak,
               <br />
               <span className="bg-gradient-to-r from-[#234F42] via-[#0A1733] to-[#234F42] bg-clip-text text-transparent">
-                Dimulai dari Latihan yang Tepat
+                Tapi Masih Ragu Saat Mengerjakan Soal?
               </span>
             </h1>
 
             <p className="mt-6 max-w-2xl text-base font-medium leading-8 text-slate-600 md:text-lg">
-              Medivault membantu mahasiswa kedokteran mempersiapkan ujian melalui latihan soal CBT, pembahasan yang mudah dipahami, dan analisis hasil belajar.
+             Latihan soal CBT kedokteran, pembahasan, dan materi ringkas untuk membantu kamu tahu apa yang sudah dikuasai dan apa yang masih perlu dipelajari.
             </p>
 
             <div className="mt-9 flex flex-col gap-4 sm:flex-row sm:items-center">
@@ -177,7 +172,7 @@ text-[#234F42]">
               </div>
             </div>
 
-            <div className="mt-8 grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-3">
+            <div className="mt-8 grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-2">
               <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">
                 <CheckCircle2 size={17} className="text-[#0F766E]" />
                 Pembahasan Soal
@@ -293,8 +288,8 @@ text-[#234F42]">
       </section>
 
       {/* STATS */}
-<section id="fitur" className="px-6 pb-10 md:px-12">
-        <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-3">
+<section id="fitur" className="px-6 pb-8 md:px-12">
+        <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-2">
           {stats.map((item, i) => (
             <motion.div
               key={i}
@@ -303,14 +298,14 @@ text-[#234F42]">
               transition={{ delay: i * 0.12, duration: 0.5 }}
               viewport={{ once: true }}
               className={`rounded-[28px] border border-slate-100 p-6 shadow-[0_14px_40px_rgba(6,27,58,0.06)] ${
-                i === 2
+                i === 1
                   ? "bg-[#0A1733] text-white"
                   : "bg-white text-[#061B3A]"
               }`}
             >
               <p
                 className={`text-sm font-bold ${
-                  i === 2 ? "text-white/70" : "text-slate-500"
+                  i === 1 ? "text-white/70" : "text-slate-500"
                 }`}
               >
                 {item.label}
@@ -320,7 +315,7 @@ text-[#234F42]">
 
               <p
                 className={`mt-3 text-sm font-medium leading-6 ${
-                  i === 2 ? "text-white/70" : "text-slate-500"
+                  i === 1 ? "text-white/70" : "text-slate-500"
                 }`}
               >
                 {item.desc}

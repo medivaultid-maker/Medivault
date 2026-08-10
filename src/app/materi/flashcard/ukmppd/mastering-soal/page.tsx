@@ -1,10 +1,11 @@
 "use client";
 
-import InfoLayout from "../../../components/info/InfoLayout";
-import InfoHero from "../../../components/info/InfoHero";
+import InfoLayout from "../../../../components/info/InfoLayout";
+import InfoHero from "../../../../components/info/InfoHero";
 import { useState } from "react";
+
 import {
-  Brain,
+  Stethoscope,
   CheckCircle2,
   ShoppingCart,
   ChevronLeft,
@@ -15,23 +16,23 @@ import {
 
 const previews = [
   {
-    src: "/images/flashcard/flashcard-histologi-preview.png",
+    src: "/images/ukmppd/mastering-soal-ukmppd-preview.png",
     title: "Daftar Materi",
-    desc: "Flashcard tersusun berdasarkan berbagai topik histologi.",
+    desc: "Kumpulan soal UKMPPD yang disusun berdasarkan berbagai topik dan bidang ilmu kedokteran.",
   },
   {
-    src: "/images/flashcard/histologi-card-1.png",
-    title: "Contoh Flashcard",
-    desc: "Contoh pertanyaan dan jawaban yang digunakan dalam flashcard.",
+    src: "/images/ukmppd/mastering-soal-ukmppd-soal.png",
+    title: "Contoh Soal",
+    desc: "Contoh soal yang digunakan untuk melatih kemampuan memahami kasus dan menentukan jawaban yang paling tepat.",
   },
   {
-    src: "/images/flashcard/histologi-card-2.png",
+    src: "/images/ukmppd/mastering-soal-ukmppd-pembahasan.png",
     title: "Contoh Pembahasan",
-    desc: "Dilengkapi penjelasan singkat untuk membantu memahami materi.",
+    desc: "Dilengkapi jawaban dan pembahasan singkat untuk membantu memahami konsep di balik setiap soal.",
   },
 ];
 
-export default function HistologiFlashcardPage() {
+export default function MasteringSoalUKMPPDPage() {
   const [activePreview, setActivePreview] = useState(0);
   const [showPreview, setShowPreview] = useState(false);
 
@@ -50,10 +51,11 @@ export default function HistologiFlashcardPage() {
   return (
     <InfoLayout>
 
+      {/* HERO */}
       <InfoHero
-        title="Flashcard Histologi"
-        subtitle="Review cepat konsep dan struktur penting histologi dengan flashcard yang praktis dan terstruktur."
-        icon={<Brain size={40} />}
+        title="Mastering Soal UKMPPD"
+        subtitle="Latihan soal UKMPPD dalam bentuk flashcard Anki untuk membantu memperbanyak latihan, mengenali pola soal, dan memperkuat pemahaman konsep."
+        icon={<Stethoscope size={40} />}
       />
 
       {/* DESKRIPSI PRODUK */}
@@ -63,13 +65,14 @@ export default function HistologiFlashcardPage() {
           <div className="rounded-[32px] border border-slate-100 bg-white p-8 shadow-[0_14px_40px_rgba(6,27,58,0.06)] md:p-10">
 
             <h2 className="text-2xl font-black text-[#061B3A]">
-              Flashcard Ujian — Histologi
+              Mastering Soal UKMPPD
             </h2>
 
             <p className="mt-4 leading-7 text-slate-600">
-              Flashcard Histologi untuk membantu mengulang materi,
-              mengingat struktur jaringan, dan mempersiapkan diri menghadapi
-              ujian dengan metode belajar yang lebih praktis.
+              Mastering Soal UKMPPD merupakan kumpulan soal latihan
+              yang dikemas dalam bentuk flashcard Anki untuk membantu
+              memperbanyak latihan, mengenali pola soal, dan memperkuat
+              pemahaman konsep melalui pembahasan yang sistematis.
             </p>
 
             <div className="mt-8 space-y-4">
@@ -77,7 +80,7 @@ export default function HistologiFlashcardPage() {
               <div className="flex items-start gap-3">
                 <CheckCircle2
                   size={20}
-                  className="mt-1 shrink-0 text-[#0F766E]"
+                  className="mt-1 shrink-0 text-[#3F628F]"
                 />
 
                 <p className="text-slate-600">
@@ -88,33 +91,33 @@ export default function HistologiFlashcardPage() {
               <div className="flex items-start gap-3">
                 <CheckCircle2
                   size={20}
-                  className="mt-1 shrink-0 text-[#0F766E]"
+                  className="mt-1 shrink-0 text-[#3F628F]"
                 />
 
                 <p className="text-slate-600">
-                  Materi disusun berdasarkan berbagai topik histologi
+                  Berisi kumpulan soal latihan UKMPPD
                 </p>
               </div>
 
               <div className="flex items-start gap-3">
                 <CheckCircle2
                   size={20}
-                  className="mt-1 shrink-0 text-[#0F766E]"
+                  className="mt-1 shrink-0 text-[#3F628F]"
                 />
 
                 <p className="text-slate-600">
-                  Membantu review materi secara cepat
+                  Dilengkapi jawaban dan pembahasan
                 </p>
               </div>
 
               <div className="flex items-start gap-3">
                 <CheckCircle2
                   size={20}
-                  className="mt-1 shrink-0 text-[#0F766E]"
+                  className="mt-1 shrink-0 text-[#3F628F]"
                 />
 
                 <p className="text-slate-600">
-                  Cocok digunakan sebagai persiapan sebelum ujian
+                  Membantu latihan dan review soal secara praktis
                 </p>
               </div>
 
@@ -130,16 +133,16 @@ export default function HistologiFlashcardPage() {
 
         <div className="mb-8 text-center">
 
-          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#ECFDF5] text-[#0F766E]">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EEF2F7] text-[#3F628F]">
             <Eye size={28} />
           </div>
 
           <h2 className="mt-4 text-3xl font-black text-[#061B3A]">
-            Preview Flashcard
+            Preview Materi
           </h2>
 
           <p className="mx-auto mt-3 max-w-2xl leading-7 text-slate-600">
-            Lihat contoh tampilan dan isi flashcard sebelum membeli.
+            Lihat contoh soal dan pembahasan sebelum membeli.
           </p>
 
         </div>
@@ -166,9 +169,11 @@ export default function HistologiFlashcardPage() {
                 />
 
                 <div className="absolute inset-0 flex items-center justify-center bg-[#061B3A]/0 transition group-hover:bg-[#061B3A]/20">
+
                   <span className="rounded-full bg-white px-4 py-2 text-sm font-bold text-[#061B3A] opacity-0 shadow-lg transition group-hover:opacity-100">
                     Lihat Preview
                   </span>
+
                 </div>
 
               </div>
@@ -199,7 +204,7 @@ export default function HistologiFlashcardPage() {
             <div>
 
               <p className="text-sm font-semibold text-slate-500">
-                Flashcard Histologi
+                Mastering Soal UKMPPD
               </p>
 
               <p className="mt-1 text-3xl font-black text-[#061B3A]">
@@ -213,13 +218,13 @@ export default function HistologiFlashcardPage() {
             </div>
 
             <a
-              href="http://lynk.id/medivault/xm2px00qoqmg/checkout"
+              href="http://lynk.id/medivault/p26e64g2nmpz/checkout"
               target="_blank"
               rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-[#0A1733] to-[#234F42] px-7 py-4 font-extrabold !text-white shadow-[0_18px_40px_rgba(6,27,58,0.18)] transition hover:-translate-y-0.5"
             >
               <ShoppingCart size={19} />
-              Beli Flashcard
+              Beli Materi
             </a>
 
           </div>
