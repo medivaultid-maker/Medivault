@@ -59,6 +59,13 @@ export async function createAttempt(
       user_id: userId,
       package_id: packageId,
       score: 0,
+      passing_grade: 70,
+      correct_count: 0,
+      wrong_count: 0,
+      unanswered_count: 0,
+      doubt_count: 0,
+      total_questions: 0,
+      duration: 0,
       status: "ongoing",
     })
     .select()
@@ -116,7 +123,10 @@ export async function createSession(
       attempt_id: attemptId,
       duration,
       finished: false,
-    });
+      started_at: new Date().toISOString(),
+    })
+    .select()
+    .single();
 }
 
 export async function finishSession(
@@ -143,17 +153,38 @@ export async function startExam(
     return;
   }
 
-  const { data: profile } = await getUserToken(user.id);
+  // ==========================================
+  // 1. AMBIL PROFILE USER
+  // ==========================================
 
-  if (!profile) {
+  const { data: profile, error: profileError } =
+    await getUserToken(user.id);
+
+  if (profileError || !profile) {
+    console.error(profileError);
     alert("Profil tidak ditemukan.");
     return;
   }
 
-  const { data: activeSession } = await getActiveSession(
-    user.id,
-    item.id
-  );
+  // ==========================================
+  // 2. CEK SESSION AKTIF
+  // ==========================================
+
+  const {
+    data: activeSession,
+    error: sessionError,
+  } = await getActiveSession(user.id, item.id);
+
+  if (sessionError) {
+    console.error(sessionError);
+    alert("Gagal mengecek sesi ujian.");
+    return;
+  }
+
+  // ==========================================
+  // 3. KALAU MASIH ADA SESSION
+  // → LANJUTKAN ATTEMPT LAMA
+  // ==========================================
 
   if (activeSession) {
     localStorage.setItem(
@@ -165,48 +196,108 @@ export async function startExam(
     return;
   }
 
+  // ==========================================
+  // 4. CEK TOKEN
+  // ==========================================
+
   if (profile.token < item.tokenCost) {
     alert("Token tidak cukup.");
     return;
   }
 
-  const { data: attempt, error } =
-    await createAttempt(user.id, item.id);
+  // ==========================================
+  // 5. BUAT ATTEMPT
+  // ==========================================
 
-  if (error || !attempt) {
+  const {
+    data: attempt,
+    error: attemptError,
+  } = await createAttempt(
+    user.id,
+    item.id
+  );
+
+  if (attemptError || !attempt) {
+    console.error(attemptError);
     alert("Gagal membuat attempt.");
     return;
   }
+
+  // ==========================================
+  // 6. BUAT SESSION
+  // ==========================================
+
+  const {
+    data: session,
+    error: createSessionError,
+  } = await createSession(
+    user.id,
+    item.id,
+    attempt.id,
+    item.duration
+  );
+
+  if (createSessionError || !session) {
+    console.error(createSessionError);
+
+    // rollback attempt
+    await supabase
+      .from("exam_attempts")
+      .delete()
+      .eq("id", attempt.id);
+
+    alert("Gagal membuat sesi ujian.");
+    return;
+  }
+
+  // ==========================================
+  // 7. POTONG TOKEN
+  // ==========================================
+
+  const newToken =
+    profile.token - item.tokenCost;
+
+  const {
+    error: tokenError,
+  } = await updateUserToken(
+    user.id,
+    newToken
+  );
+
+  if (tokenError) {
+    console.error(tokenError);
+
+    // rollback session
+    await supabase
+      .from("exam_sessions")
+      .delete()
+      .eq("attempt_id", attempt.id);
+
+    // rollback attempt
+    await supabase
+      .from("exam_attempts")
+      .delete()
+      .eq("id", attempt.id);
+
+    alert("Gagal memproses token.");
+    return;
+  }
+
+  // ==========================================
+  // 8. SIMPAN ATTEMPT ID
+  // ==========================================
 
   localStorage.setItem(
     "medivault_attempt_id",
     attempt.id
   );
 
- await createSession(
-  user.id,
-  item.id,
-  attempt.id,
-  item.duration
-);
+  setToken(newToken);
 
-  await updateUserToken(
-    user.id,
-    profile.token - item.tokenCost
-  );
+  // ==========================================
+  // 9. MASUK UJIAN
+  // ==========================================
 
-  setToken(profile.token - item.tokenCost);
-
-  const { data: questions } =
-    await getQuestions(item.id);
-
-  localStorage.setItem(
-    "medivault_selected_package",
-    JSON.stringify({
-      ...item,
-      questions,
-    })
-  );
-
-  window.location.href = `/ujian/${item.id}`;
+  window.location.href =
+    `/ujian/${item.id}`;
 }

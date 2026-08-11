@@ -58,7 +58,14 @@ const categories = [
   { label: "CBT Mikrobiologi", value: "mikrobiologi-teori" },
   { label: "Praktikum Mikrobiologi", value: "mikrobiologi-praktikum" },
 ];
-
+const blocks = [
+  "Anatomi",
+  "Histologi",
+  "Biokimia",
+  "Fisiologi",
+  "Parasitologi",
+  "Mikrobiologi",
+];
 function SortableJump({
   id,
   number,
@@ -106,10 +113,11 @@ export default function AdminPaketPage() {
   const [importText, setImportText] = useState("");
   const [previewMode, setPreviewMode] = useState(false);
 
-  const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("anatomi-teori");
-  const isPraktikum = category.includes("praktikum");
-  const [duration, setDuration] = useState(60);
+ const [title, setTitle] = useState("");
+const [category, setCategory] = useState("anatomi-teori");
+const [block, setBlock] = useState("Anatomi");
+const isPraktikum = category.includes("praktikum");
+const [duration, setDuration] = useState(60);
   const [tokenCost, setTokenCost] = useState(1);
   const [activeId, setActiveId] = useState<string | null>(null);
 
@@ -133,6 +141,156 @@ const sensors = useSensors(
     discussion: "",
   },
 ]);
+
+  // ==========================================
+  // AUTO-SAVE DRAFT
+  // ==========================================
+
+  const DRAFT_KEY = "medivault_admin_paket_draft_v1";
+
+  const [draftStatus, setDraftStatus] = useState<
+    "loading" | "saved" | "saving" | "empty"
+  >("loading");
+
+  const draftLoaded = useRef(false);
+
+  // ==========================================
+  // LOAD DRAFT SAAT HALAMAN DIBUKA
+  // ==========================================
+
+  useEffect(() => {
+    try {
+      const savedDraft = localStorage.getItem(DRAFT_KEY);
+
+      if (savedDraft) {
+        const draft = JSON.parse(savedDraft);
+
+        if (draft.title !== undefined) {
+          setTitle(draft.title);
+        }
+
+        if (draft.category !== undefined) {
+          setCategory(draft.category);
+        }
+
+        if (draft.block !== undefined) {
+  setBlock(draft.block);
+}
+
+        if (draft.duration !== undefined) {
+          setDuration(draft.duration);
+        }
+
+        if (draft.tokenCost !== undefined) {
+          setTokenCost(draft.tokenCost);
+        }
+
+        if (draft.importText !== undefined) {
+          setImportText(draft.importText);
+        }
+
+        if (
+          Array.isArray(draft.questions) &&
+          draft.questions.length > 0
+        ) {
+          setQuestions(draft.questions);
+        }
+
+        console.log("Draft MediVault berhasil dipulihkan");
+
+        setDraftStatus("saved");
+      } else {
+        setDraftStatus("empty");
+      }
+    } catch (error) {
+      console.error("Gagal memuat draft:", error);
+      setDraftStatus("empty");
+    }
+
+    draftLoaded.current = true;
+  }, []);
+
+  // ==========================================
+  // AUTO-SAVE SETIAP ADA PERUBAHAN
+  // ==========================================
+
+  useEffect(() => {
+    if (!draftLoaded.current) return;
+
+    setDraftStatus("saving");
+
+    const timeout = setTimeout(() => {
+      try {
+        const draft = {
+  title,
+  category,
+  block,
+  duration,
+  tokenCost,
+  importText,
+  questions,
+  savedAt: new Date().toISOString(),
+};
+
+        localStorage.setItem(
+          DRAFT_KEY,
+          JSON.stringify(draft)
+        );
+
+        setDraftStatus("saved");
+      } catch (error) {
+        console.error("Gagal menyimpan draft:", error);
+
+        setDraftStatus("empty");
+      }
+    }, 500);
+
+    return () => clearTimeout(timeout);
+  }, [
+  title,
+  category,
+  block,
+  duration,
+  tokenCost,
+  importText,
+  questions,
+]);
+
+  // ==========================================
+  // HAPUS DRAFT
+  // ==========================================
+
+  const clearDraft = () => {
+    const confirmed = window.confirm(
+      "Hapus draft paket ini? Semua data yang belum dipublish akan hilang."
+    );
+
+    if (!confirmed) return;
+
+    localStorage.removeItem(DRAFT_KEY);
+
+   setTitle("");
+setCategory("anatomi-teori");
+setBlock("Anatomi");
+setDuration(60);
+setTokenCost(1);
+setImportText("");
+
+    setQuestions([
+      {
+        id: crypto.randomUUID(),
+        topic: "",
+        question: "",
+        options: ["", "", "", "", ""],
+        answer: 0,
+        essayAnswer: [""],
+        discussion: "",
+      },
+    ]);
+
+    setDraftStatus("empty");
+  };
+
 const answerRefs = useRef<HTMLInputElement[]>([]);
   const inputClass =
     "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-emerald-400 focus:ring-4 focus:ring-emerald-50";
@@ -466,68 +624,110 @@ const deleteEssayAnswer = (
     reader.readAsDataURL(file);
   };
 
-  const publishPackage = async () => {
+ const publishPackage = async () => {
   if (!title.trim()) {
     alert("Nama paket belum diisi!");
     return;
   }
 
-  // 1. Simpan paket
+  // ==========================================
+  // 1. SIMPAN PAKET
+  // ==========================================
+
   const { data: paket, error: paketError } = await supabase
     .from("exam_packages")
     .insert([
       {
         title,
         category,
+        block,
         duration,
         token_cost: tokenCost,
         total_questions: questions.length,
+        status: "published",
       },
     ])
     .select()
     .single();
 
   if (paketError) {
-    console.error(paketError);
+    console.error("ERROR SIMPAN PAKET =", paketError);
     alert("Gagal menyimpan paket");
     return;
   }
 
-  // 2. Simpan semua soal
-  const soalRows = questions.map((q) => ({
-    package_id: paket.id,
-    topic: q.topic || null,
+  // ==========================================
+  // 2. SIAPKAN DATA SOAL
+  // ==========================================
 
-    question: q.question,
-    image: q.image || null,
+  const questionsToInsert = questions.map((q, index) => ({
+  package_id: paket.id,
 
-    options: q.options || null,
-    answer: q.answer ?? null,
+  topic: q.topic?.trim() || null,
 
-    essay_answer:
-  q.essayAnswer?.filter((v) => v.trim() !== "") || [],
+  // Block mengikuti block paket
+  block: paket.block,
 
-    discussion: q.discussion || "",
-    discussion_image: q.discussionImage || null,
-  }));
+  question: q.question?.trim() || "",
 
-  const { data, error: soalError } = await supabase
+  image: q.image || null,
+
+  options:
+    !isPraktikum && q.options
+      ? q.options
+      : null,
+
+  answer:
+    !isPraktikum && q.answer !== undefined
+      ? q.answer
+      : null,
+
+  essay_answer:
+    isPraktikum && q.essayAnswer
+      ? q.essayAnswer.filter(
+          (answer) => answer.trim() !== ""
+        )
+      : null,
+
+  discussion: q.discussion || "",
+  discussion_image: q.discussionImage || null,
+
+  order_no: index + 1,
+}));
+
+  // ==========================================
+  // 3. SIMPAN SEMUA SOAL
+  // ==========================================
+
+ console.log("BLOCK PAKET =", paket.block);
+console.log("SOAL YANG AKAN DIINSERT =", questionsToInsert);
+
+const { data, error: soalError } = await supabase
   .from("questions")
-  .insert(soalRows)
+  .insert(questionsToInsert)
   .select();
 
-console.log("SOAL YANG DIKIRIM =", soalRows);
 console.log("HASIL INSERT =", data);
 console.log("ERROR INSERT =", soalError);
 
 if (soalError) {
-  alert(JSON.stringify(soalError));
+  console.error("ERROR SIMPAN SOAL =", soalError);
+  alert("Paket berhasil dibuat, tetapi soal gagal disimpan.");
   return;
 }
 
-alert("Paket & soal berhasil disimpan!");
+  // ==========================================
+  // 4. BERHASIL
+  // ==========================================
 
-window.location.href = "/admin";
+    alert("Paket & soal berhasil disimpan!");
+
+  // Hapus draft hanya setelah paket + soal berhasil
+  localStorage.removeItem(DRAFT_KEY);
+
+  setDraftStatus("empty");
+
+  window.location.href = "/admin";
 };
 
   if (previewMode) {
@@ -643,9 +843,33 @@ window.location.href = "/admin";
                 </p>
               </div>
 
-              <span className="rounded-full bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700">
-                Draft
-              </span>
+              <div className="flex items-center gap-2">
+  {draftStatus === "saving" && (
+    <span className="rounded-full bg-amber-50 px-4 py-2 text-xs font-bold text-amber-700">
+      Menyimpan...
+    </span>
+  )}
+
+  {draftStatus === "saved" && (
+    <span className="rounded-full bg-emerald-50 px-4 py-2 text-xs font-bold text-emerald-700">
+      ✓ Draft tersimpan otomatis
+    </span>
+  )}
+
+  {draftStatus === "empty" && (
+    <span className="rounded-full bg-slate-100 px-4 py-2 text-xs font-bold text-slate-600">
+      Draft baru
+    </span>
+  )}
+
+  <button
+    type="button"
+    onClick={clearDraft}
+    className="rounded-full bg-red-50 px-4 py-2 text-xs font-bold text-red-600 transition hover:bg-red-100"
+  >
+    Hapus Draft
+  </button>
+</div>
             </div>
 
             <div className="grid gap-4 md:grid-cols-2">
@@ -679,6 +903,28 @@ window.location.href = "/admin";
                   ))}
                 </select>
               </div>
+
+              <div>
+  <label className="mb-2 block text-sm font-bold text-slate-700">
+    Block
+  </label>
+
+  <select
+    className={inputClass}
+    value={block}
+    onChange={(e) => setBlock(e.target.value)}
+  >
+    {blocks.map((item) => (
+      <option key={item} value={item}>
+        {item}
+      </option>
+    ))}
+  </select>
+
+  <p className="mt-2 text-xs leading-5 text-slate-500">
+    Block materi utama yang digunakan dalam paket ini.
+  </p>
+</div>
 
               <div>
                 <label className="mb-2 block text-sm font-bold text-slate-700">
@@ -821,7 +1067,7 @@ Pembahasan: Pernyataan 1, 2, dan 3 benar karena sesuai dengan alur sirkulasi jan
     </div>
 
     <label className="mb-2 block font-semibold text-slate-700">
-  Topik
+  Topic
 </label>
 
 <select
@@ -829,7 +1075,7 @@ Pembahasan: Pernyataan 1, 2, dan 3 benar karena sesuai dengan alur sirkulasi jan
   value={q.topic}
   onChange={(e) => updateTopic(i, e.target.value)}
 >
-  <option value="">Pilih BAB</option>
+  <option value="">Pilih Topic</option>
 
   {(TOPICS[category] || []).map((topic) => (
     <option key={topic} value={topic}>
@@ -1085,6 +1331,9 @@ Misalnya:
           <button onClick={publishPackage} className={`w-full ${emeraldButton}`}>
             Publish Paket
           </button>
+          <p className="mt-3 text-center text-xs text-slate-400">
+  Draft tersimpan otomatis di perangkat ini. Kamu aman untuk refresh halaman.
+</p>
         </div>
       </section>
     </main>

@@ -4,6 +4,7 @@ import { TOPICS } from "../../lib/topics";
 export type QuestionItem = {
   id: string;
   topic: string;
+  block?: string;
   question: string;
   image?: string;
   options?: string[];

@@ -48,7 +48,14 @@ const categories = [
   { label: "CBT Mikrobiologi", value: "mikrobiologi-teori" },
   { label: "Praktikum Mikrobiologi", value: "mikrobiologi-praktikum" },
 ];
-
+const blocks = [
+  "Anatomi",
+  "Histologi",
+  "Biokimia",
+  "Fisiologi",
+  "Parasitologi",
+  "Mikrobiologi",
+];
 function SortableJump({
   id,
   number,
@@ -96,7 +103,8 @@ export default function AdminPaketPage() {
   const [previewMode, setPreviewMode] = useState(false);
 
   const [title, setTitle] = useState("");
-  const [category, setCategory] = useState("anatomi-teori");
+const [category, setCategory] = useState("anatomi-teori");
+const [block, setBlock] = useState("Anatomi");
   const isPraktikum = category.includes("praktikum");
   const [duration, setDuration] = useState(60);
   const [tokenCost, setTokenCost] = useState(1);
@@ -116,10 +124,11 @@ const router = useRouter();
 const id = params.id as string;
 
   const [questions, setQuestions] = useState<QuestionItem[]>([
-{
- id: crypto.randomUUID(),
- topic: "",
- question: "",
+  {
+    id: crypto.randomUUID(),
+    topic: "",
+    block: "Anatomi",
+    question: "",
  options: [],
  answer: undefined,
  essayAnswer: [""],
@@ -176,9 +185,10 @@ useEffect(() => {
     if (!paket) return;
 
     setTitle(paket.title);
-    setCategory(paket.category);
-    setDuration(paket.duration);
-    setTokenCost(paket.token_cost);
+setCategory(paket.category);
+setBlock(paket.block || "Anatomi");
+setDuration(paket.duration);
+setTokenCost(paket.token_cost);
 
     // ambil soal
     const { data: soal } = await supabase
@@ -190,19 +200,32 @@ useEffect(() => {
     if (!soal) return;
 
     setQuestions(
-      soal.map((q) => ({
-        id: q.id,
-        topic: q.topic || "",
-        question: q.question,
-        image: q.image,
-        options: q.options || ["","","","",""],
-        answer: q.answer,
-        essayAnswer: q.essay_answer || [""],
-        discussion: q.discussion,
-        discussionImage: q.discussion_image,
-        
-      }))
-    );
+  soal.map((q) => ({
+    id: q.id,
+    topic: q.topic || "",
+    block: q.block || paket.block || "",
+    question: q.question || "",
+    image: q.image || undefined,
+
+    options:
+      q.options && Array.isArray(q.options)
+        ? q.options
+        : undefined,
+
+    answer:
+      q.answer !== null && q.answer !== undefined
+        ? q.answer
+        : undefined,
+
+    essayAnswer:
+      Array.isArray(q.essay_answer) && q.essay_answer.length > 0
+        ? q.essay_answer
+        : [""],
+
+    discussion: q.discussion || "",
+    discussionImage: q.discussion_image || undefined,
+  }))
+);
   };
 
   loadPackage();
@@ -252,12 +275,17 @@ useEffect(() => {
   const addQuestion = () => {
   setQuestions([
     ...questions,
-    {
-      id: crypto.randomUUID(),
-      topic: "",
-      question: "",
-      options: ["","","","",""],
-      answer: 0,
+   {
+  id: crypto.randomUUID(),
+  topic: "",
+  block: block,
+  question: "",
+      options: isPraktikum
+        ? undefined
+        : ["", "", "", "", ""],
+      answer: isPraktikum
+        ? undefined
+        : 0,
       essayAnswer: [""],
       discussion: "",
     },
@@ -318,107 +346,178 @@ const handleDragEnd = (event: any) => {
     return;
   }
 
-  if (id) {
-    // UPDATE PAKET
+  if (questions.length < 1) {
+    alert("Minimal harus ada 1 soal!");
+    return;
+  }
 
-    const { error } = await supabase
+  // =========================
+  // MODE EDIT
+  // =========================
+  if (id) {
+    // 1. Update data paket
+    const { error: packageError } = await supabase
       .from("exam_packages")
       .update({
-        title,
+        title: title.trim(),
         category,
+        block,
         duration,
         token_cost: tokenCost,
         total_questions: questions.length,
       })
       .eq("id", id);
 
-    if (error) {
-      alert("Gagal update paket");
+    if (packageError) {
+      console.error("PACKAGE UPDATE ERROR:", packageError);
+      alert("Gagal mengupdate data paket.");
       return;
     }
 
-    // hapus soal lama
+    // 2. Hapus semua soal lama
     const { error: deleteError } = await supabase
-  .from("questions")
-  .delete()
-  .eq("package_id", id);
+      .from("questions")
+      .delete()
+      .eq("package_id", id);
 
+    if (deleteError) {
+      console.error("DELETE QUESTIONS ERROR:", deleteError);
+      alert("Gagal menghapus soal lama.");
+      return;
+    }
 
-if (deleteError) {
-  console.error(deleteError);
-  alert("Gagal menghapus soal lama");
-  return;
-}
+    // 3. Masukkan soal terbaru
+    const questionsToInsert = questions.map((q, index) => ({
+      package_id: id,
 
-    // insert soal baru
-const { error: insertQuestionError } = await supabase
-  .from("questions")
-  .insert(
-    questions.map((q, index) => ({
-  package_id: id,
-  topic: q.topic || "",
-  question: q.question,
-  image: q.image || null,
-  options: q.options || null,
-  answer: q.answer ?? null,
-  essay_answer: q.essayAnswer || null,
-  discussion: q.discussion || "",
-  discussion_image: q.discussionImage || null,
-  order_no: index + 1,
-}))
-  );
+      topic: q.topic?.trim() || null,
+      block: q.block?.trim() || block,
+      question: q.question?.trim() || "",
 
-if (insertQuestionError) {
-  console.error(insertQuestionError);
-  alert("Soal gagal diperbarui");
-  return;
-}
+      image: q.image || null,
 
-alert("Paket berhasil diupdate!");
+      options:
+        !isPraktikum && q.options
+          ? q.options
+          : null,
 
-router.push("/admin/daftar-paket");
-router.refresh();
-return;
+      answer:
+        !isPraktikum && q.answer !== undefined
+          ? q.answer
+          : null,
+
+      essay_answer:
+        isPraktikum && q.essayAnswer
+          ? q.essayAnswer.filter((answer) => answer.trim() !== "")
+          : null,
+
+      discussion: q.discussion || "",
+      discussion_image: q.discussionImage || null,
+
+      order_no: index + 1,
+    }));
+
+    const { error: insertError } = await supabase
+      .from("questions")
+      .insert(questionsToInsert);
+
+    if (insertError) {
+      console.error("INSERT QUESTIONS ERROR:", insertError);
+      alert("Soal gagal diperbarui.");
+      return;
+    }
+
+    alert("Paket berhasil diupdate!");
+
+    router.push("/admin/daftar-paket");
+    router.refresh();
+
+    return;
   }
 
-  // MODE TAMBAH BARU
+  // =========================
+  // MODE BUAT PAKET BARU
+  // =========================
 
-  const { data: paket, error: paketError } = await supabase
+  // 1. Buat paket
+  const { data: paket, error: packageError } = await supabase
     .from("exam_packages")
     .insert([
       {
-        title,
+        title: title.trim(),
         category,
+        block,
         duration,
         token_cost: tokenCost,
         total_questions: questions.length,
+
+        // Karena tombolnya Publish Paket
+        status: "published",
       },
     ])
     .select()
     .single();
 
-  if (paketError) {
-    alert("Gagal membuat paket");
+  if (packageError || !paket) {
+    console.error("CREATE PACKAGE ERROR:", packageError);
+    alert("Gagal membuat paket.");
     return;
   }
 
- await supabase.from("questions").insert(
-  questions.map((q, index) => ({
-      package_id: paket.id,
-      topic: q.topic || "",
-      question: q.question,
-      image: q.image || null,
-      options: q.options || null,
-      answer: q.answer ?? null,
-      essay_answer: q.essayAnswer || null,
-      discussion: q.discussion || "",
-      discussion_image: q.discussionImage || null,
-order_no: index + 1,
-    }))
-  );
+  // 2. Siapkan soal
+  const questionsToInsert = questions.map((q, index) => ({
+    package_id: paket.id,
+
+    topic: q.topic?.trim() || null,
+    question: q.question?.trim() || "",
+
+    image: q.image || null,
+
+    options:
+      !isPraktikum && q.options
+        ? q.options
+        : null,
+
+    answer:
+      !isPraktikum && q.answer !== undefined
+        ? q.answer
+        : null,
+
+    essay_answer:
+      isPraktikum && q.essayAnswer
+        ? q.essayAnswer.filter((answer) => answer.trim() !== "")
+        : null,
+
+    discussion: q.discussion || "",
+    discussion_image: q.discussionImage || null,
+
+    order_no: index + 1,
+  }));
+
+  // 3. Masukkan soal
+  const { error: questionsError } = await supabase
+    .from("questions")
+    .insert(questionsToInsert);
+
+  if (questionsError) {
+    console.error("CREATE QUESTIONS ERROR:", questionsError);
+
+    // rollback paket kalau insert soal gagal
+    await supabase
+      .from("exam_packages")
+      .delete()
+      .eq("id", paket.id);
+
+    alert("Paket berhasil dibuat, tetapi soal gagal disimpan.");
+    return;
+  }
 
   alert("Paket berhasil dibuat!");
+
+  router.push("/admin/daftar-paket");
+  router.refresh();
 };
+
 
   if (previewMode) {
     return (
@@ -555,6 +654,28 @@ order_no: index + 1,
                   ))}
                 </select>
               </div>
+
+              <div>
+  <label className="mb-2 block text-sm font-bold text-slate-700">
+    Block
+  </label>
+
+  <select
+    className={inputClass}
+    value={block}
+    onChange={(e) => setBlock(e.target.value)}
+  >
+    {blocks.map((item) => (
+      <option key={item} value={item}>
+        {item}
+      </option>
+    ))}
+  </select>
+
+  <p className="mt-2 text-xs leading-5 text-slate-500">
+    Block materi utama yang digunakan dalam paket ini.
+  </p>
+</div>
 
               <div>
                 <label className="mb-2 block text-sm font-bold text-slate-700">

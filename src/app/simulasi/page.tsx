@@ -99,13 +99,8 @@ const [packages, setPackages] = useState<any[]>([]);
     {weakestTopics.length > 0 && (
       <button
         onClick={() => {
-          localStorage.setItem(
-            "ai_topic",
-            weakestTopics[0].topic
-          );
-
-          window.location.href = "/ujian/ai";
-        }}
+  window.location.href = "/simulasi/ai";
+}}
         style={styles.aiButton}
       >
         🚀 Mulai Latihan 

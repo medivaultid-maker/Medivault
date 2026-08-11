@@ -25,7 +25,7 @@ const packages = [
     description: "Cocok untuk persiapan ujian dan latihan rutin.",
   },
 ];
-
+const ADMIN_WHATSAPP = "6281332171676";
 export default function TokenPage() {
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [selectedPackage, setSelectedPackage] = useState(packages[1]);
@@ -74,7 +74,8 @@ setCheckingAccess(false);
 };
 
   const confirmPayment = async () => {
-    if (paymentStatus === "pending") return;
+  if (paymentStatus === "pending") return;
+
   const {
     data: { user },
   } = await supabase.auth.getUser();
@@ -82,25 +83,34 @@ setCheckingAccess(false);
   if (!user) return;
 
   const { error } = await supabase
-.from("payment_requests")
-.insert({
-    user_id: user.id,
-    package_name: selectedPackage.name,
-    token: selectedPackage.token,
-    amount: Number(
+    .from("payment_requests")
+    .insert({
+      user_id: user.id,
+      package_name: selectedPackage.name,
+      token: selectedPackage.token,
+      amount: Number(
         selectedPackage.price.replace(/[^\d]/g, "")
-    ),
-    status: "pending",
-});
+      ),
+      status: "pending",
+    });
 
-if (error) {
+  if (error) {
     console.error(error);
     alert("Gagal mengirim permintaan pembayaran.");
     return;
-}
+  }
 
-setPaymentStatus("pending");
-  };
+  setPaymentStatus("pending");
+
+  // Buka WhatsApp setelah pembayaran dikonfirmasi
+  const message =
+    "Saya sudah bayar akses latihan Medivault";
+
+  const whatsappUrl =
+    `https://wa.me/${ADMIN_WHATSAPP}?text=${encodeURIComponent(message)}`;
+
+  window.open(whatsappUrl, "_blank");
+};
 
   if (checkingAccess) {
     return (

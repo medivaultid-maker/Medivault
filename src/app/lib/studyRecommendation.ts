@@ -1,56 +1,50 @@
-const recommendations:any = {
 
-  "Neuroanatomi": [
-    "Nervus cranialis",
-    "Traktus sensorik dan motorik",
-    "Vaskularisasi otak"
-  ],
+import { supabase } from "./supabase";
 
-  "Histologi": [
-    "Epitel jaringan",
-    "Jaringan ikat",
-    "Jaringan saraf"
-  ],
+export async function generateRecommendation(weakest: any[]) {
+  if (!weakest || weakest.length === 0) {
+    return [];
+  }
 
-  "Anatomi": [
-    "Regio anatomi",
-    "Hubungan antar struktur",
-    "Vaskularisasi organ"
-  ],
+  const recommendations = await Promise.all(
+    weakest.map(async (item) => {
+      const block = item.topic;
 
-  "Muskuloskeletal": [
-    "Otot utama",
-    "Innervasi",
-    "Perlekatan otot"
-  ]
+      // Ambil semua soal dari block tersebut
+      const { data: questions, error } = await supabase
+        .from("questions")
+        .select("topic")
+        .eq("block", block);
 
-};
+      if (error) {
+        console.error(
+          `Gagal mengambil topic untuk block ${block}:`,
+          error
+        );
+      }
 
+      // Ambil topic unik dari soal yang benar-benar ada di database
+      const subtopics = Array.from(
+        new Set(
+          (questions || [])
+            .map((question: any) => question.topic)
+            .filter(Boolean)
+        )
+      );
 
-export function generateRecommendation(
- weakest:any[]
-){
+      return {
+        block,
+        score: item.score,
+        subtopics,
 
- if(!weakest || weakest.length===0){
-  return [];
- }
+        materials: [
+          "Review konsep dasar",
+          "Latihan soal kembali",
+          "Pelajari pembahasan",
+        ],
+      };
+    })
+  );
 
-
- return weakest.map(item=>({
-
-  topic:item.topic,
-
-  score:item.score,
-
-  materials:
-    recommendations[item.topic]
-    ||
-    [
-      "Review konsep dasar",
-      "Latihan soal kembali",
-      "Pelajari pembahasan"
-    ]
-
- }));
-
+  return recommendations;
 }
