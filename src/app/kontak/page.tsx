@@ -19,7 +19,7 @@ import {
   Bug,
 } from "lucide-react";
 
-import { FaInstagram } from "react-icons/fa";
+import { FaInstagram, FaWhatsapp } from "react-icons/fa";
 
 export default function KontakPage() {
     const [form, setForm] = useState({
@@ -97,6 +97,22 @@ ${form.pesan}
                   </p>
                 </div>
               </div>
+
+              <div className="flex items-start gap-5">
+  <div className="rounded-2xl bg-[#ECFDF5] p-4 text-[#0F766E]">
+    <FaWhatsapp size={26} />
+  </div>
+
+  <div>
+    <h3 className="font-bold text-[#061B3A]">
+      WhatsApp
+    </h3>
+
+    <p className="mt-2 text-slate-600">
+      085867005466
+    </p>
+  </div>
+</div>
 
               <div className="flex items-start gap-5">
                 <div className="rounded-2xl bg-[#ECFDF5] p-4 text-[#0F766E]">

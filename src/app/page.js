@@ -44,22 +44,6 @@ function InstagramIcon({ className = "h-4 w-4" }) {
   );
 }
 
-function FacebookIcon({ className = "h-4 w-4" }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M13.5 21v-7h2.3l.4-3h-2.7V9.2c0-.9.2-1.5 1.5-1.5h1.3V5.1c-.2 0-1-.1-2-.1-2 0-3.4 1.2-3.4 3.6V11H8.5v3h2.4v7h2.6Z" />
-    </svg>
-  );
-}
-
-function TwitterIcon({ className = "h-4 w-4" }) {
-  return (
-    <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
-      <path d="M18.9 3H22l-6.8 7.8L23 21h-6.1l-4.8-6.2L6.7 21H3.6l7.3-8.3L1 3h6.2l4.3 5.7L18.9 3Zm-1.1 16h1.7L6.3 4.9H4.5L17.8 19Z" />
-    </svg>
-  );
-}
-
 function YoutubeIcon({ className = "h-4 w-4" }) {
   return (
     <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
@@ -358,7 +342,7 @@ text-[#234F42]">
             {/* FOOTER */}
       <footer className="border-t border-slate-200 bg-white/95 py-10">
         <div className="mx-auto max-w-7xl px-6 md:px-10">
-          <div className="grid gap-10 md:grid-cols-[1.4fr_0.8fr_0.8fr_0.9fr_1.4fr]">
+         <div className="grid gap-10 md:grid-cols-[1.4fr_0.8fr_0.9fr_1.4fr]">
             
 {/* BRAND */}
 <div className="self-start">
@@ -369,7 +353,7 @@ text-[#234F42]">
 />
 
   <p className="mt-0 max-w-xs text-sm font-medium leading-6 text-slate-500">
-    Platform latihan soal kedokteran untuk belajar lebih terarah.
+    Platform belajar kedokteran
   </p>
 
   <div className="mt-4 flex items-center gap-3">
@@ -384,27 +368,7 @@ text-[#234F42]">
   </a>
 
   <a
-    href="#"
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label="Facebook Medivault"
-    className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 shadow-sm transition hover:-translate-y-0.5 hover:border-[#0F766E]/20 hover:bg-[#ECFDF5] hover:text-[#0F766E]"
-  >
-    <FacebookIcon className="h-4 w-4" />
-  </a>
-
-  <a
-    href="#"
-    target="_blank"
-    rel="noopener noreferrer"
-    aria-label="Twitter Medivault"
-    className="flex h-9 w-9 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500 shadow-sm transition hover:-translate-y-0.5 hover:border-[#0F766E]/20 hover:bg-[#ECFDF5] hover:text-[#0F766E]"
-  >
-    <TwitterIcon className="h-4 w-4" />
-  </a>
-
-  <a
-    href="#"
+    href="https://www.youtube.com/@medivaultid"
     target="_blank"
     rel="noopener noreferrer"
     aria-label="YouTube Medivault"
@@ -413,53 +377,6 @@ text-[#234F42]">
     <YoutubeIcon className="h-4 w-4" />
   </a>
 </div>
-            </div>
-
-            {/* NAVIGASI */}
-            <div>
-              <h3 className="mb-5 text-sm font-black text-[#061B3A]">
-                Navigasi
-              </h3>
-
-              <ul className="space-y-3 text-sm font-medium text-slate-500">
-              
-<li>
-  <Link
-    href="/"
-    className="transition hover:text-[#0F766E]"
-  >
-    Beranda
-  </Link>
-</li>
-
-<li>
-  <Link
-    href="/simulasi"
-    className="transition hover:text-[#0F766E]"
-  >
-    Simulasi
-  </Link>
-</li>
-
-<li>
-  <Link
-    href="/token"
-    className="transition hover:text-[#0F766E]"
-  >
-    Akses Latihan
-  </Link>
-</li>
-
-<li>
-  <Link
-    href="/materi"
-    className="transition hover:text-[#0F766E]"
-  >
-    Materi Kedokteran
-  </Link>
-</li>
-
-              </ul>
             </div>
 
             {/* INFORMASI */}
