@@ -10,10 +10,6 @@ import {
   getEssayFeedback,
 } from "../../lib/essayMatcher";
 
-import {
-  generateAIReport
-} from "../../lib/aiLearningReport";
-
 type ExamAttempt = {
   id: string;
   package_id: string;
@@ -153,11 +149,6 @@ return (
     );
   }
 
-  const aiReport =
-  result.topic_stats
-    ? generateAIReport(result.topic_stats)
-    : null;
-
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#F8FAFC] via-white to-[#EEF2FF]">
       <Navbar />
@@ -232,58 +223,6 @@ return (
               </Link>
             </div>
           </div>
-        
-
-        {aiReport && (
-<div className="
-mt-6 rounded-2xl
-border border-indigo-200
-bg-indigo-50
-p-6
-shadow-lg
-">
-
-<h2 className="
-text-xl
-font-extrabold
-text-[#061B3A]
-">
-🤖 Learning Report
-</h2>
-
-
-<div className="mt-5">
-
-<p className="font-bold text-emerald-600">
-💪 Topik Terkuat
-</p>
-
-{aiReport.strongest.map(item=>(
-<p key={item.topic}>
-✅ {item.topic} ({item.score}%)
-</p>
-))}
-
-</div>
-
-
-<div className="mt-5">
-
-<p className="font-bold text-red-600">
-📚 Perlu Dipelajari
-</p>
-
-{aiReport.weakest.map(item=>(
-<p key={item.topic}>
-⚠️ {item.topic} ({item.score}%)
-</p>
-))}
-
-</div>
-
-
-</div>
-)}
 
         {/* ANALISIS KEMAMPUAN */}
 {result.topic_stats &&
