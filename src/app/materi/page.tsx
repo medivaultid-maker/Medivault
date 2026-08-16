@@ -10,10 +10,17 @@ import {
   Stethoscope,
   Layers,
   LockKeyhole,
+  CalendarCheck,
 } from "lucide-react";
 
 
 const materials = [
+  {
+  icon: <CalendarCheck size={30} />,
+  title: "Planner Preklinik",
+  desc: "Bantu atur jadwal belajar, target blok, dan progres akademik selama masa preklinik.",
+  href: "/materi/planner-preklinik",
+},
   {
   icon: <BookOpen size={32} />,
   title: "Ebook Kedokteran",
@@ -32,21 +39,6 @@ const materials = [
   desc: "Kartu belajar singkat untuk mengingat konsep dan poin penting sebelum ujian.",
   href: "/materi/flashcard",
 },
-  {
-    icon: <Microscope size={30} />,
-    title: "Atlas Histologi",
-    desc: "Kumpulan gambar dan pembahasan histologi, serta preparat praktikum.",
-  },
-  {
-    icon: <Stethoscope size={30} />,
-    title: "Catatan Koas",
-    desc: "Catatan pengalaman klinik, tips stase, dan persiapan menghadapi dunia klinis.",
-  },
-  {
-    icon: <Layers size={30} />,
-    title: "Ringkasan UKMPPD",
-    desc: "Materi ringkas dan poin penting untuk membantu persiapan ujian kompetensi dokter.",
-  },
   {
   icon: <Layers size={32} />,
   title: "Flashcard UKMPPD",

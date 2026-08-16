@@ -9,8 +9,7 @@ import { supabase } from "../lib/supabase";
 export default function SimulasiPage() {
   const [checkingAccess, setCheckingAccess] = useState(true);
   const [token, setToken] = useState(0);
-  const [weakestTopics, setWeakestTopics] = useState<any[]>([]);
-const [packages, setPackages] = useState<any[]>([]);
+ 
   useEffect(() => {
   const loadUser = async () => {
     const {
@@ -26,7 +25,7 @@ const [packages, setPackages] = useState<any[]>([]);
 
     const { data: profile } = await supabase
   .from("profiles")
-  .select("role, token, weakest_topics")
+  .select("role, token")
   .eq("id", user.id)
   .single();
 
@@ -41,7 +40,7 @@ const [packages, setPackages] = useState<any[]>([]);
     }
 
     setToken(profile.token || 0);
-    setWeakestTopics(profile.weakest_topics || []);
+   
     setCheckingAccess(false);
   };
 
@@ -78,59 +77,7 @@ const [packages, setPackages] = useState<any[]>([]);
   </p>
 </div>
 
-         <div style={styles.heroBox}>
-
-  <div style={styles.heroLeft}>
-
-    <div style={styles.aiBadge}>
-      🤖 Adaptive Learning
-    </div>
-
-    <h2 style={styles.heroTitle}>
-      Latihan Berdasarkan Kelemahanmu
-    </h2>
-
-    <p style={styles.heroText}>
-      {weakestTopics.length > 0
-        ? <>Topik yang perlu kamu kuasai selanjutnya adalah <b>{weakestTopics[0].topic}</b>.</>
-        : "Kerjakan beberapa simulasi terlebih dahulu agar AI dapat menganalisis kemampuanmu."}
-    </p>
-
-    {weakestTopics.length > 0 && (
-      <button
-        onClick={() => {
-  window.location.href = "/simulasi/ai";
-}}
-        style={styles.aiButton}
-      >
-        🚀 Mulai Latihan 
-      </button>
-    )}
-
-  </div>
-
-  <div style={styles.heroRight}>
-
-    <div style={styles.tokenCard}>
-      <p style={styles.tokenLabel}>
-        Jumlah Akses
-      </p>
-
-      <h2 style={styles.tokenValue}>
-        {token}
-      </h2>
-
-      <Link
-        href="/token"
-        style={styles.tokenButton}
-      >
-        Tambah Akses
-      </Link>
-    </div>
-
-  </div>
-
-</div>
+        
 
         <div style={styles.grid}>
   {/* ================= ANATOMI ================= */}
