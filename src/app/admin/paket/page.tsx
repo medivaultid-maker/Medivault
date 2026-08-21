@@ -24,6 +24,7 @@ import { CSS } from "@dnd-kit/utilities";
 type QuestionItem = {
   id: string;
   topic: string;
+  difficulty: "easy" | "medium" | "hard";
   question: string;
   image?: string;
   options?: string[];
@@ -129,12 +130,12 @@ const sensors = useSensors(
   })
 );
 
-  const [questions, setQuestions] = useState<QuestionItem[]>([
+ const [questions, setQuestions] = useState<QuestionItem[]>([
   {
-  id: crypto.randomUUID(),
-  topic: "",
-
-  question: "",
+    id: crypto.randomUUID(),
+    topic: "",
+    difficulty: "medium",
+    question: "",
     options: isPraktikum ? undefined : ["", "", "", "", ""],
     answer: isPraktikum ? undefined : 0,
     essayAnswer: [""],
@@ -277,16 +278,17 @@ setTokenCost(1);
 setImportText("");
 
     setQuestions([
-      {
-        id: crypto.randomUUID(),
-        topic: "",
-        question: "",
-        options: ["", "", "", "", ""],
-        answer: 0,
-        essayAnswer: [""],
-        discussion: "",
-      },
-    ]);
+  {
+    id: crypto.randomUUID(),
+    topic: "",
+    difficulty: "medium",
+    question: "",
+    options: ["", "", "", "", ""],
+    answer: 0,
+    essayAnswer: [""],
+    discussion: "",
+  },
+]);
 
     setDraftStatus("empty");
   };
@@ -460,7 +462,7 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     return {
   id: crypto.randomUUID(),
   topic: "",
-
+  difficulty: "medium",
   question: questionLines.join("\n").trim(),
   options: optionMap,
   answer: answerIndex,
@@ -498,6 +500,15 @@ console.log("JUMLAH =", parsed.length);
   const updateTopic = (i: number, val: string) => {
   const copy = [...questions];
   copy[i].topic = val;
+  setQuestions(copy);
+};
+
+const updateDifficulty = (
+  i: number,
+  val: "easy" | "medium" | "hard"
+) => {
+  const copy = [...questions];
+  copy[i].difficulty = val;
   setQuestions(copy);
 };
 
@@ -563,13 +574,13 @@ const deleteEssayAnswer = (
   setQuestions(copy);
 };
 
-  const addQuestion = () => {
+ const addQuestion = () => {
   setQuestions([
     ...questions,
     {
       id: crypto.randomUUID(),
       topic: "",
-      
+      difficulty: "medium",
       question: "",
       options: isPraktikum ? undefined : ["", "", "", "", ""],
       answer: isPraktikum ? undefined : 0,
@@ -665,7 +676,8 @@ const deleteEssayAnswer = (
 
   topic: q.topic?.trim() || null,
 
-  // Block mengikuti block paket
+  difficulty: q.difficulty || "medium",
+
   block: paket.block,
 
   question: q.question?.trim() || "",
@@ -1066,22 +1078,40 @@ Pembahasan: Pernyataan 1, 2, dan 3 benar karena sesuai dengan alur sirkulasi jan
       </h3>
     </div>
 
-    <label className="mb-2 block font-semibold text-slate-700">
+   <label className="mb-2 block font-semibold text-slate-700">
   Topic
 </label>
 
-<select
+<input
+  type="text"
   className={`${inputClass} mb-4`}
+  placeholder="Contoh: Nervus cranialis"
   value={q.topic}
   onChange={(e) => updateTopic(i, e.target.value)}
->
-  <option value="">Pilih Topic</option>
+/>
 
-  {(TOPICS[category] || []).map((topic) => (
-    <option key={topic} value={topic}>
-      {topic}
-    </option>
-  ))}
+<p className="mb-5 -mt-2 text-xs leading-5 text-slate-500">
+  Ketik topic/subbab soal secara manual. Contoh: Nervus cranialis,
+  Vaskularisasi otak, atau Traktus sensorik.
+</p>
+
+<label className="mb-2 block font-semibold text-slate-700">
+  Tingkat Kesulitan
+</label>
+
+<select
+  className={`${inputClass} mb-5`}
+  value={q.difficulty}
+  onChange={(e) =>
+    updateDifficulty(
+      i,
+      e.target.value as "easy" | "medium" | "hard"
+    )
+  }
+>
+  <option value="easy">Mudah</option>
+  <option value="medium">Sedang</option>
+  <option value="hard">Sulit</option>
 </select>
 
     <label className="font-semibold text-slate-700">

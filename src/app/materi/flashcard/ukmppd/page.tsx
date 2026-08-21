@@ -10,67 +10,144 @@ import {
 
 const flashcards = [
   {
-    title: "Penyakit Dalam",
+    title: "Dermatovenerologi",
     description:
-      "Flashcard untuk membantu mengingat konsep, diagnosis, dan tatalaksana penting penyakit dalam.",
-    available: false,
+      "Flashcard untuk membantu mengingat diagnosis, tatalaksana, dan konsep penting dermatovenerologi.",
+    href: "/materi/flashcard/ukmppd/dermatovenerologi",
+    available: true,
   },
   {
-    title: "Bedah",
+    title: "Forensik",
     description:
-      "Flashcard untuk review cepat konsep dan kasus penting dalam bidang bedah.",
-    available: false,
+      "Flashcard untuk review cepat konsep penting ilmu kedokteran forensik.",
+    href: "/materi/flashcard/ukmppd/forensik",
+    available: true,
   },
   {
-    title: "Ilmu Kesehatan Anak",
+    title: "GEH",
     description:
-      "Flashcard untuk membantu mengingat konsep dan kasus penting pediatri.",
-    available: false,
+      "Flashcard untuk membantu mengingat konsep dan kasus penting gastroenterohepatologi.",
+    href: "/materi/flashcard/ukmppd/GEH",
+    available: true,
   },
   {
-    title: "Obstetri & Ginekologi",
+    title: "Ginekologi",
     description:
-      "Flashcard untuk review konsep penting obstetri dan ginekologi.",
-    available: false,
+      "Flashcard untuk review diagnosis dan tatalaksana penting dalam bidang ginekologi.",
+    href: "/materi/flashcard/ukmppd/ginekologi",
+    available: true,
   },
   {
-    title: "Neurologi",
+    title: "HOM",
     description:
-      "Flashcard untuk membantu mengingat diagnosis dan konsep penting neurologi.",
-    available: false,
+      "Flashcard untuk membantu mengingat konsep penting hematologi dan onkologi medik.",
+    href: "/materi/flashcard/ukmppd/HOM",
+    available: true,
+  },
+  {
+    title: "IKM",
+    description:
+      "Flashcard untuk review konsep penting ilmu kesehatan masyarakat.",
+    href: "/materi/flashcard/ukmppd/IKM",
+    available: true,
+  },
+  {
+    title: "Kardiologi",
+    description:
+      "Flashcard untuk membantu mengingat diagnosis dan tatalaksana penting kardiologi.",
+    href: "/materi/flashcard/ukmppd/kardiologi",
+    available: true,
   },
   {
     title: "Mata",
     description:
       "Flashcard untuk review cepat penyakit dan konsep penting oftalmologi.",
-    available: false,
+    href: "/materi/flashcard/ukmppd/mata",
+    available: true,
+  },
+  {
+    title: "Neurologi",
+    description:
+      "Flashcard untuk membantu mengingat diagnosis dan konsep penting neurologi.",
+    href: "/materi/flashcard/ukmppd/neurologi",
+    available: true,
+  },
+  {
+    title: "Obstetri",
+    description:
+      "Flashcard untuk review konsep, diagnosis, dan tatalaksana penting obstetri.",
+    href: "/materi/flashcard/ukmppd/obstetri",
+    available: true,
+  },
+  {
+    title: "Pediatri",
+    description:
+      "Flashcard untuk membantu mengingat konsep dan kasus penting pediatri.",
+    href: "/materi/flashcard/ukmppd/pediatri",
+    available: true,
+  },
+  {
+    title: "Psikiatri",
+    description:
+      "Flashcard untuk review diagnosis dan konsep penting psikiatri.",
+    href: "/materi/flashcard/ukmppd/psikiatri",
+    available: true,
+  },
+  {
+    title: "Respirasi",
+    description:
+      "Flashcard untuk membantu mengingat diagnosis dan tatalaksana penting sistem respirasi.",
+    href: "/materi/flashcard/ukmppd/respirasi",
+    available: true,
   },
   {
     title: "THT",
     description:
-      "Flashcard untuk membantu mengingat konsep dan kasus penting THT.",
-    available: false,
+      "Flashcard untuk review cepat penyakit dan konsep penting THT.",
+    href: "/materi/flashcard/ukmppd/THT",
+    available: true,
   },
   {
-  title: "Kulit & Kelamin",
-  description:
-    "Flashcard untuk review diagnosis dan konsep penting dermatologi.",
-  href: "/materi/flashcard/ukmppd/kulit-kelamin",
-  available: true,
-},
-{
+    title: "Endokrin",
+    description:
+      "Flashcard untuk membantu mengingat konsep, diagnosis, dan tatalaksana penting endokrinologi.",
+    href: "/materi/flashcard/ukmppd/endokrin",
+    available: true,
+  },
+  {
+    title: "Kedokteran Tropis",
+    description:
+      "Flashcard untuk review penyakit infeksi dan konsep penting kedokteran tropis.",
+    href: "/materi/flashcard/ukmppd/kedokteran-tropis",
+    available: true,
+  },
+  {
+    title: "Nefrologi",
+    description:
+      "Flashcard untuk membantu mengingat diagnosis dan tatalaksana penting nefrologi.",
+    href: "/materi/flashcard/ukmppd/nefrologi",
+    available: true,
+  },
+  {
+    title: "Bedah",
+    description:
+      "Flashcard untuk review cepat konsep, diagnosis, dan tatalaksana penting bidang bedah.",
+    href: "/materi/flashcard/ukmppd/bedah",
+    available: true,
+  },
+  {
     title: "Mastering Soal",
     description:
       "Soal yang sering keluar dan menjebak di UKMPPD.",
     href: "/materi/flashcard/ukmppd/mastering-soal",
-  available: true,
+    available: true,
   },
   {
     title: "Mastering Soal Pt. 2",
     description:
       "Soal yang sering keluar dan menjebak di UKMPPD.",
     href: "/materi/flashcard/ukmppd/mastering-soal-pt.2",
-  available: true,
+    available: true,
   },
 ];
 
