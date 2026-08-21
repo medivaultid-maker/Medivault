@@ -24,7 +24,7 @@ import { CSS } from "@dnd-kit/utilities";
 type QuestionItem = {
   id: string;
   topic: string;
-  difficulty: "easy" | "medium" | "hard";
+  difficulty?: string;
   question: string;
   image?: string;
   options?: string[];
@@ -397,7 +397,11 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     return blocks;
   };
 
-  const parseSingleQuestionBlock = (block: string): QuestionItem => {
+  const parseSingleQuestionBlock = (
+  block: string,
+  importedTopic: string = "",
+  importedDifficulty: "easy" | "medium" | "hard" = "medium"
+): QuestionItem => {
   const lines = block
     .split("\n")
     .map((l) => l.trim())
@@ -405,6 +409,7 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
 
   const questionLines: string[] = [];
   const discussionLines: string[] = [];
+
   const optionMap = ["", "", "", "", ""];
 
   let currentOption: number | null = null;
@@ -415,16 +420,32 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
   lines.forEach((rawLine, index) => {
     let line = rawLine.trim();
 
-    // Hapus nomor soal jika ada
+    if (!line) return;
+
+    // ==========================================
+    // HAPUS NOMOR SOAL
+    // ==========================================
     if (index === 0) {
       line = line
-        .replace(/^\d{1,3}\s*[\.\)]\s*/, "")
+        .replace(/^\d{1,3}\s*[.)]\s*/, "")
         .trim();
     }
 
-    // =========================
+    // ==========================================
+    // ABAIKAN TOPIC / TINGKAT KESULITAN
+    // JIKA MASIH TERDAPAT DI DALAM BLOCK
+    // ==========================================
+    if (/^topic\s*:/i.test(line)) {
+      return;
+    }
+
+    if (/^tingkat\s+kesulitan\s*:/i.test(line)) {
+      return;
+    }
+
+    // ==========================================
     // KUNCI JAWABAN
-    // =========================
+    // ==========================================
     const answerMatch = line.match(
       /^(?:kunci\s*)?(?:jawaban|answer|ans)\s*[:=\-]?\s*([A-E])/i
     );
@@ -435,9 +456,9 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
       return;
     }
 
-    // =========================
+    // ==========================================
     // PEMBAHASAN
-    // =========================
+    // ==========================================
     const discussionMatch = line.match(
       /^(?:pembahasan|bahasan|penjelasan|discussion|rationale)\s*[:=\-]?\s*(.*)$/i
     );
@@ -446,8 +467,7 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
       isDiscussion = true;
       currentOption = null;
 
-      const discussionText =
-        discussionMatch[1]?.trim();
+      const discussionText = discussionMatch[1]?.trim();
 
       if (discussionText) {
         discussionLines.push(discussionText);
@@ -456,41 +476,47 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
       return;
     }
 
-    // Setelah masuk pembahasan,
-    // SEMUA baris dianggap pembahasan.
+    // ==========================================
+    // SETELAH PEMBAHASAN
+    // SEMUA BARIS MASUK PEMBAHASAN
+    // ==========================================
     if (isDiscussion) {
-  discussionLines.push(line);
-  return;
-}
+      discussionLines.push(line);
+      return;
+    }
 
-    // =========================
-    // DETEKSI OPSI
-    // =========================
+    // ==========================================
+    // DETEKSI PILIHAN A-E
+    // ==========================================
     const optionMatch = line.match(
-      /^([A-E])\s*[\.\)]\s+(.*)$/i
+      /^([A-E])\s*[.)]\s+(.*)$/i
     );
 
     if (optionMatch) {
-      const optionIndex = getAnswerIndex(
-        optionMatch[1]
-      );
+      const label = optionMatch[1].toUpperCase();
+      const textAfterLabel = optionMatch[2]?.trim() || "";
+
+      const optionIndex = getAnswerIndex(label);
 
       /*
-       * Kasus penting:
+       * KASUS KHUSUS ANATOMI
        *
        * A. dorsalis pedis merupakan lanjutan dari...
        *
-       * Ini adalah SOAL, bukan pilihan.
+       * adalah SOAL.
        *
        * Sedangkan:
        *
        * A. A. tibialis posterior
        *
-       * adalah pilihan.
+       * adalah PILIHAN A.
+       *
+       * Jadi hanya A. yang langsung diikuti istilah anatomi
+       * yang dianggap sebagai soal, KECUALI kalau bentuknya
+       * A. A. ...
        */
 
-      const textAfterLabel =
-        optionMatch[2]?.trim() || "";
+      const isDoubleLabel = /^A\.\s*A\./i.test(textAfterLabel);
 
       const looksLikeAnatomyStatement =
         /^a\.\s+/i.test(textAfterLabel) ||
@@ -499,17 +525,19 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
         /^m\.\s+/i.test(textAfterLabel) ||
         /^r\.\s+/i.test(textAfterLabel);
 
-      // Kalau ini A. + istilah anatomi,
-      // dan opsi belum dimulai → anggap sebagai soal.
       if (
         !optionsStarted &&
         optionIndex === 0 &&
-        looksLikeAnatomyStatement
+        looksLikeAnatomyStatement &&
+        !isDoubleLabel
       ) {
         questionLines.push(line);
         return;
       }
 
+      // ==========================================
+      // INI BENAR-BENAR PILIHAN
+      // ==========================================
       optionsStarted = true;
 
       optionMap[optionIndex] = textAfterLabel;
@@ -518,9 +546,9 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
       return;
     }
 
-    // =========================
+    // ==========================================
     // LANJUTAN PILIHAN
-    // =========================
+    // ==========================================
     if (
       optionsStarted &&
       currentOption !== null
@@ -532,43 +560,160 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
       return;
     }
 
-    // =========================
+    // ==========================================
     // BAGIAN SOAL
-    // =========================
+    // ==========================================
     questionLines.push(line);
   });
 
   return {
     id: crypto.randomUUID(),
-    topic: "",
-    question: questionLines.join(" ").replace(/\s+/g, " ").trim(),
+
+    // LANGSUNG ISI DARI IMPORT
+    topic: importedTopic,
+
+    // LANGSUNG ISI DARI IMPORT
+    difficulty: importedDifficulty,
+
+    question: questionLines
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim(),
+
     options: optionMap,
+
     answer: answerIndex,
-    discussion: discussionLines.join(" ").replace(/\s+/g, " ").trim(),
-    difficulty: "medium",
+
+    discussion: discussionLines
+      .join(" ")
+      .replace(/\s+/g, " ")
+      .trim(),
   };
 };
 
   const parseQuestionsFromText = () => {
-    if (!importText.trim()) return alert("Paste soal dulu!");
+  if (!importText.trim()) {
+    return alert("Paste soal dulu!");
+  }
 
-    const cleanText = normalizeImportText(importText);
-    const blocks = splitQuestionBlocks(cleanText);
+  // ==========================================
+  // 1. AMBIL TOPIC
+  // ==========================================
 
-    const parsed = blocks
-      .map(parseSingleQuestionBlock)
-      .filter((q) => q.question || q.options.some((opt) => opt.trim()));
+  const topicMatch = importText.match(
+    /^\s*Topic\s*:\s*(.+)$/im
+  );
 
-    if (!parsed.length) {
-      return alert("Format soal belum terbaca. Cek lagi format copas PDF-nya.");
-    }
+  const importedTopic =
+    topicMatch?.[1]?.trim() || "";
 
-    console.log("BLOCKS =", blocks);
-console.log("PARSED =", parsed);
-console.log("JUMLAH =", parsed.length);
+  // ==========================================
+  // 2. AMBIL TINGKAT KESULITAN
+  // ==========================================
 
-    setQuestions([...parsed]);
-  };
+  const difficultyMatch = importText.match(
+    /^\s*Tingkat\s+Kesulitan\s*:\s*(.+)$/im
+  );
+
+  const difficultyText =
+    difficultyMatch?.[1]?.trim().toLowerCase() || "";
+
+  let importedDifficulty:
+    | "easy"
+    | "medium"
+    | "hard" = "medium";
+
+  if (
+    difficultyText === "mudah" ||
+    difficultyText === "easy"
+  ) {
+    importedDifficulty = "easy";
+  } else if (
+    difficultyText === "sulit" ||
+    difficultyText === "hard"
+  ) {
+    importedDifficulty = "hard";
+  } else {
+    importedDifficulty = "medium";
+  }
+
+  // ==========================================
+  // 3. NORMALISASI TEXT
+  // ==========================================
+
+  const cleanText = normalizeImportText(importText);
+
+  // ==========================================
+  // 4. HILANGKAN HEADER TOPIC & KESULITAN
+  // AGAR TIDAK MASUK KE DALAM SOAL
+  // ==========================================
+
+  const textWithoutMetadata = cleanText
+    .replace(
+      /^\s*Topic\s*:\s*.+$/im,
+      ""
+    )
+    .replace(
+      /^\s*Tingkat\s+Kesulitan\s*:\s*.+$/im,
+      ""
+    )
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+
+  // ==========================================
+  // 5. PECAH MENJADI SOAL
+  // ==========================================
+
+  const blocks = splitQuestionBlocks(
+    textWithoutMetadata
+  );
+
+  // ==========================================
+  // 6. PARSE SETIAP SOAL
+  // ==========================================
+
+  const parsed = blocks
+    .map((block) =>
+      parseSingleQuestionBlock(
+        block,
+        importedTopic,
+        importedDifficulty
+      )
+    )
+    .filter(
+      (q) =>
+        q.question ||
+        q.options?.some((opt) => opt.trim())
+    );
+
+  // ==========================================
+  // 7. VALIDASI
+  // ==========================================
+
+  if (!parsed.length) {
+    return alert(
+      "Format soal belum terbaca. Cek lagi format copas PDF-nya."
+    );
+  }
+
+  console.log("TOPIC =", importedTopic);
+  console.log(
+    "DIFFICULTY =",
+    importedDifficulty
+  );
+  console.log("BLOCKS =", blocks);
+  console.log("PARSED =", parsed);
+  console.log(
+    "JUMLAH SOAL =",
+    parsed.length
+  );
+
+  // ==========================================
+  // 8. MASUKKAN KE FORM
+  // ==========================================
+
+  setQuestions(parsed);
+};
 
   const updateQuestion = (i: number, val: string) => {
     const copy = [...questions];
@@ -1164,7 +1309,7 @@ Pernyataan 1, 2, dan 3 benar karena sesuai dengan alur sirkulasi jantung.`}
 <input
   type="text"
   className={`${inputClass} mb-4`}
-  placeholder="Contoh: Nervus cranialis"
+  placeholder="Contoh: Jantung"
   value={q.topic}
   onChange={(e) => updateTopic(i, e.target.value)}
 />
