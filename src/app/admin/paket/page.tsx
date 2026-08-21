@@ -440,9 +440,7 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
   };
 
   const parseSingleQuestionBlock = (
-  block: string,
-  importedTopic: string = "",
-  importedDifficulty: "easy" | "medium" | "hard" = "medium"
+  block: string
 ): QuestionItem => {
   const lines = block
     .split("\n")
@@ -459,6 +457,54 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
   let isDiscussion = false;
   let optionsStarted = false;
 
+  // ==========================================
+  // AMBIL TOPIC PER SOAL
+  // ==========================================
+
+  let topic = "";
+
+  const topicMatch = block.match(
+    /(?:^|\n)\s*Topic\s*:\s*(.+?)(?=\n|$)/i
+  );
+
+  if (topicMatch?.[1]) {
+    topic = topicMatch[1].trim();
+  }
+
+  // ==========================================
+  // AMBIL TINGKAT KESULITAN PER SOAL
+  // ==========================================
+
+  const difficultyMatch = block.match(
+    /(?:^|\n)\s*Tingkat\s+Kesulitan\s*:\s*(.+?)(?=\n|$)/i
+  );
+
+  const difficultyText =
+    difficultyMatch?.[1]?.trim().toLowerCase() || "";
+
+  let difficulty: "easy" | "medium" | "hard" = "medium";
+
+  if (
+    difficultyText === "mudah" ||
+    difficultyText === "easy"
+  ) {
+    difficulty = "easy";
+  } else if (
+    difficultyText === "sulit" ||
+    difficultyText === "hard"
+  ) {
+    difficulty = "hard";
+  } else if (
+    difficultyText === "sedang" ||
+    difficultyText === "medium"
+  ) {
+    difficulty = "medium";
+  }
+
+  // ==========================================
+  // PARSE ISI SOAL
+  // ==========================================
+
   lines.forEach((rawLine, index) => {
     let line = rawLine.trim();
 
@@ -467,6 +513,7 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     // ==========================================
     // HAPUS NOMOR SOAL
     // ==========================================
+
     if (index === 0) {
       line = line
         .replace(/^\d{1,3}\s*[.)]\s*/, "")
@@ -474,9 +521,9 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     }
 
     // ==========================================
-    // ABAIKAN TOPIC / TINGKAT KESULITAN
-    // JIKA MASIH TERDAPAT DI DALAM BLOCK
+    // JANGAN MASUKKAN METADATA KE ISI
     // ==========================================
+
     if (/^topic\s*:/i.test(line)) {
       return;
     }
@@ -488,6 +535,7 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     // ==========================================
     // KUNCI JAWABAN
     // ==========================================
+
     const answerMatch = line.match(
       /^(?:kunci\s*)?(?:jawaban|answer|ans)\s*[:=\-]?\s*([A-E])/i
     );
@@ -501,6 +549,7 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     // ==========================================
     // PEMBAHASAN
     // ==========================================
+
     const discussionMatch = line.match(
       /^(?:pembahasan|bahasan|penjelasan|discussion|rationale)\s*[:=\-]?\s*(.*)$/i
     );
@@ -509,7 +558,8 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
       isDiscussion = true;
       currentOption = null;
 
-      const discussionText = discussionMatch[1]?.trim();
+      const discussionText =
+        discussionMatch[1]?.trim();
 
       if (discussionText) {
         discussionLines.push(discussionText);
@@ -520,8 +570,8 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
 
     // ==========================================
     // SETELAH PEMBAHASAN
-    // SEMUA BARIS MASUK PEMBAHASAN
     // ==========================================
+
     if (isDiscussion) {
       discussionLines.push(line);
       return;
@@ -530,38 +580,32 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     // ==========================================
     // DETEKSI PILIHAN A-E
     // ==========================================
+
     const optionMatch = line.match(
-      /^([A-E])\s*[.)]\s+(.*)$/i
+      /^([A-E])\s*[.)]\s*(.*)$/i
     );
 
     if (optionMatch) {
       const label = optionMatch[1].toUpperCase();
-      const textAfterLabel = optionMatch[2]?.trim() || "";
+      const textAfterLabel =
+        optionMatch[2]?.trim() || "";
 
-      const optionIndex = getAnswerIndex(label);
+      const optionIndex =
+        getAnswerIndex(label);
 
-      /*
-       * KASUS KHUSUS ANATOMI
-       *
-       * A. dorsalis pedis merupakan lanjutan dari...
-       *
-       * adalah SOAL.
-       *
-       * Sedangkan:
-       *
-       * A. A. tibialis posterior
-       *
-       * adalah PILIHAN A.
-       *
-       * Jadi hanya A. yang langsung diikuti istilah anatomi
-       * yang dianggap sebagai soal, KECUALI kalau bentuknya
-       * A. A. ...
-       */
+      // ==========================================
+      // KASUS KHUSUS ANATOMI
+      //
+      // A. dorsalis pedis merupakan...
+      //
+      // bukan pilihan, tetapi bagian dari soal.
+      // ==========================================
 
-      const isDoubleLabel = /^A\.\s*A\./i.test(textAfterLabel);
+      const isDoubleLabel =
+        /^A\.\s*A\./i.test(textAfterLabel);
 
       const looksLikeAnatomyStatement =
-  /^a\.\s+/i.test(textAfterLabel);
+        /^a\.\s+/i.test(textAfterLabel);
 
       if (
         !optionsStarted &&
@@ -574,11 +618,14 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
       }
 
       // ==========================================
-      // INI BENAR-BENAR PILIHAN
+      // BENAR-BENAR PILIHAN
       // ==========================================
+
       optionsStarted = true;
 
-      optionMap[optionIndex] = textAfterLabel;
+      optionMap[optionIndex] =
+        textAfterLabel;
+
       currentOption = optionIndex;
 
       return;
@@ -587,13 +634,15 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     // ==========================================
     // LANJUTAN PILIHAN
     // ==========================================
+
     if (
       optionsStarted &&
       currentOption !== null
     ) {
       optionMap[currentOption] +=
-        (optionMap[currentOption] ? " " : "") +
-        line;
+        (optionMap[currentOption]
+          ? " "
+          : "") + line;
 
       return;
     }
@@ -601,17 +650,20 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     // ==========================================
     // BAGIAN SOAL
     // ==========================================
+
     questionLines.push(line);
   });
 
   return {
     id: crypto.randomUUID(),
 
-    // LANGSUNG ISI DARI IMPORT
-    topic: importedTopic,
+    // ==========================================
+    // SEKARANG PER SOAL
+    // ==========================================
 
-    // LANGSUNG ISI DARI IMPORT
-    difficulty: importedDifficulty,
+    topic,
+
+    difficulty,
 
     question: questionLines
       .join(" ")
@@ -635,97 +687,40 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
   }
 
   // ==========================================
-  // 1. AMBIL TOPIC
+  // 1. NORMALISASI TEXT
   // ==========================================
 
-  const topicMatch = importText.match(
-    /^\s*Topic\s*:\s*(.+)$/im
-  );
-
-  const importedTopic =
-    topicMatch?.[1]?.trim() || "";
+  const cleanText =
+    normalizeImportText(importText);
 
   // ==========================================
-  // 2. AMBIL TINGKAT KESULITAN
+  // 2. JANGAN HAPUS TOPIC / DIFFICULTY
+  //
+  // Karena sekarang metadata memang milik
+  // masing-masing soal.
   // ==========================================
 
-  const difficultyMatch = importText.match(
-    /^\s*Tingkat\s+Kesulitan\s*:\s*(.+)$/im
-  );
-
-  const difficultyText =
-    difficultyMatch?.[1]?.trim().toLowerCase() || "";
-
-  let importedDifficulty:
-    | "easy"
-    | "medium"
-    | "hard" = "medium";
-
-  if (
-    difficultyText === "mudah" ||
-    difficultyText === "easy"
-  ) {
-    importedDifficulty = "easy";
-  } else if (
-    difficultyText === "sulit" ||
-    difficultyText === "hard"
-  ) {
-    importedDifficulty = "hard";
-  } else {
-    importedDifficulty = "medium";
-  }
+  const blocks =
+    splitQuestionBlocks(cleanText);
 
   // ==========================================
-  // 3. NORMALISASI TEXT
-  // ==========================================
-
-  const cleanText = normalizeImportText(importText);
-
-  // ==========================================
-  // 4. HILANGKAN HEADER TOPIC & KESULITAN
-  // AGAR TIDAK MASUK KE DALAM SOAL
-  // ==========================================
-
-  const textWithoutMetadata = cleanText
-    .replace(
-      /^\s*Topic\s*:\s*.+$/im,
-      ""
-    )
-    .replace(
-      /^\s*Tingkat\s+Kesulitan\s*:\s*.+$/im,
-      ""
-    )
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-
-  // ==========================================
-  // 5. PECAH MENJADI SOAL
-  // ==========================================
-
-  const blocks = splitQuestionBlocks(
-    textWithoutMetadata
-  );
-
-  // ==========================================
-  // 6. PARSE SETIAP SOAL
+  // 3. PARSE SETIAP SOAL
   // ==========================================
 
   const parsed = blocks
     .map((block) =>
-      parseSingleQuestionBlock(
-        block,
-        importedTopic,
-        importedDifficulty
-      )
+      parseSingleQuestionBlock(block)
     )
     .filter(
       (q) =>
         q.question ||
-        q.options?.some((opt) => opt.trim())
+        q.options?.some(
+          (opt) => opt.trim()
+        )
     );
 
   // ==========================================
-  // 7. VALIDASI
+  // 4. VALIDASI
   // ==========================================
 
   if (!parsed.length) {
@@ -734,20 +729,60 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     );
   }
 
-  console.log("TOPIC =", importedTopic);
+  // ==========================================
+  // 5. DEBUG
+  // ==========================================
+
   console.log(
-    "DIFFICULTY =",
-    importedDifficulty
+    "===================================="
   );
-  console.log("BLOCKS =", blocks);
-  console.log("PARSED =", parsed);
+
+  console.log(
+    "HASIL IMPORT SOAL:"
+  );
+
+  parsed.forEach((q, index) => {
+    console.log(
+      `SOAL ${index + 1}`
+    );
+
+    console.log(
+      "Topic:",
+      q.topic
+    );
+
+    console.log(
+      "Difficulty:",
+      q.difficulty
+    );
+
+    console.log(
+      "Question:",
+      q.question
+    );
+
+    console.log(
+      "Answer:",
+      q.answer
+    );
+
+    console.log(
+      "Discussion:",
+      q.discussion
+    );
+
+    console.log(
+      "--------------------"
+    );
+  });
+
   console.log(
     "JUMLAH SOAL =",
     parsed.length
   );
 
   // ==========================================
-  // 8. MASUKKAN KE FORM
+  // 6. MASUKKAN KE FORM
   // ==========================================
 
   setQuestions(parsed);
@@ -1244,9 +1279,9 @@ if (soalError) {
                   Import Soal dari PDF
                 </h2>
                 <p className="mt-1 text-sm leading-6 text-slate-500">
-                  Support opsi A-E, tipe kombinasi angka, kunci jawaban, dan
-                  pembahasan otomatis dari teks.
-                </p>
+  Support opsi A-E, tipe kombinasi angka, kunci jawaban,
+  pembahasan, serta Topic dan Tingkat Kesulitan untuk setiap soal.
+</p>
               </div>
 
               <button onClick={parseQuestionsFromText} className={primaryButton}>
