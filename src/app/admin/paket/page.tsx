@@ -1003,7 +1003,6 @@ if (soalError) {
 2) Ventrikel kiri memompa darah ke aorta
 3) Katup trikuspid berada di sisi kanan
 4) Vena pulmonalis membawa darah miskin oksigen
-
 A. 1, 2, dan 3
 B. 1 dan 3
 C. 2 dan 4
@@ -1011,7 +1010,8 @@ D. 4 saja
 E. Semua benar
 
 Jawaban: A
-Pembahasan: Pernyataan 1, 2, dan 3 benar karena sesuai dengan alur sirkulasi jantung.`}
+Pembahasan: 
+Pernyataan 1, 2, dan 3 benar karena sesuai dengan alur sirkulasi jantung.`}
             />
 
             <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-800">
