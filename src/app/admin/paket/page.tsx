@@ -561,11 +561,7 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
       const isDoubleLabel = /^A\.\s*A\./i.test(textAfterLabel);
 
       const looksLikeAnatomyStatement =
-        /^a\.\s+/i.test(textAfterLabel) ||
-        /^v\.\s+/i.test(textAfterLabel) ||
-        /^n\.\s+/i.test(textAfterLabel) ||
-        /^m\.\s+/i.test(textAfterLabel) ||
-        /^r\.\s+/i.test(textAfterLabel);
+  /^a\.\s+/i.test(textAfterLabel);
 
       if (
         !optionsStarted &&
