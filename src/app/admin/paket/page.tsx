@@ -332,22 +332,24 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
   const optionLabels = ["A", "B", "C", "D", "E"];
 
   const normalizeImportText = (text: string) => {
-    return text
-      .replace(/\r/g, "\n")
-      .replace(/\u00A0/g, " ")
-      .replace(/[“”]/g, '"')
-      .replace(/[‘’]/g, "'")
-      .replace(/[–—]/g, "-")
-      .replace(/[ \t]+/g, " ")
-      .replace(/\s+(?=[A-Ea-e]\s*[\.\)]\s+)/g, "\n")
-      .replace(/\s+(?=(?:Kunci\s*)?Jawaban\s*[:=\-])/gi, "\n")
-      .replace(
-        /\s+(?=(?:Pembahasan|Bahasan|Penjelasan|Discussion|Rationale)\s*[:=\-]?)/gi,
-        "\n"
-      )
-      .replace(/\n{3,}/g, "\n\n")
-      .trim();
-  };
+  return text
+    .replace(/\r/g, "\n")
+    .replace(/\u00A0/g, " ")
+    .replace(/[“”]/g, '"')
+    .replace(/[‘’]/g, "'")
+    .replace(/[–—]/g, "-")
+    .replace(/[ \t]+/g, " ")
+    .replace(
+      /\s+(?=(?:Kunci\s*)?Jawaban\s*[:=\-])/gi,
+      "\n"
+    )
+    .replace(
+      /\s+(?=(?:Pembahasan|Bahasan|Penjelasan|Discussion|Rationale)\s*[:=\-]?)/gi,
+      "\n"
+    )
+    .replace(/\n{3,}/g, "\n\n")
+    .trim();
+};
 
   const getAnswerIndex = (label: string) => {
     const idx = optionLabels.indexOf(label.toUpperCase());
@@ -355,9 +357,12 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
   };
 
   const hasEnoughOptions = (block: string) => {
-    const matches = block.match(/(?:^|\n)\s*[A-E]\s*[\.\)]\s+/gi);
-    return (matches ?? []).length >= 3;
-  };
+  const matches = block.match(
+    /(?:^|\n)\s*[A-E]\s*[\.\)]\s+/gi
+  );
+
+  return (matches ?? []).length >= 3;
+};
 
   const splitQuestionBlocks = (text: string) => {
     const marked = ("\n" + text).replace(
@@ -393,82 +398,156 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
   };
 
   const parseSingleQuestionBlock = (block: string): QuestionItem => {
-    const lines = block
-      .split("\n")
-      .map((l) => l.trim())
-      .filter(Boolean);
+  const lines = block
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
 
-    const questionLines: string[] = [];
-    const discussionLines: string[] = [];
-    const optionMap = ["", "", "", "", ""];
+  const questionLines: string[] = [];
+  const discussionLines: string[] = [];
+  const optionMap = ["", "", "", "", ""];
 
-    let currentOption: number | null = null;
-    let answerIndex = 0;
-    let isDiscussion = false;
+  let currentOption: number | null = null;
+  let answerIndex = 0;
+  let isDiscussion = false;
+  let optionsStarted = false;
 
-    lines.forEach((rawLine, index) => {
-      let line = rawLine.trim();
+  lines.forEach((rawLine, index) => {
+    let line = rawLine.trim();
 
-      if (index === 0) {
-        line = line.replace(/^\d{1,3}\s*[\.\)]\s*/, "").trim();
+    // Hapus nomor soal jika ada
+    if (index === 0) {
+      line = line
+        .replace(/^\d{1,3}\s*[\.\)]\s*/, "")
+        .trim();
+    }
+
+    // =========================
+    // KUNCI JAWABAN
+    // =========================
+    const answerMatch = line.match(
+      /^(?:kunci\s*)?(?:jawaban|answer|ans)\s*[:=\-]?\s*([A-E])/i
+    );
+
+    if (answerMatch) {
+      answerIndex = getAnswerIndex(answerMatch[1]);
+      currentOption = null;
+      return;
+    }
+
+    // =========================
+    // PEMBAHASAN
+    // =========================
+    const discussionMatch = line.match(
+      /^(?:pembahasan|bahasan|penjelasan|discussion|rationale)\s*[:=\-]?\s*(.*)$/i
+    );
+
+    if (discussionMatch) {
+      isDiscussion = true;
+      currentOption = null;
+
+      const discussionText =
+        discussionMatch[1]?.trim();
+
+      if (discussionText) {
+        discussionLines.push(discussionText);
       }
 
-      const answerMatch = line.match(
-        /^(?:kunci\s*)?(?:jawaban|answer|ans)\s*[:=\-]?\s*([A-E])/i
+      return;
+    }
+
+    // Setelah masuk pembahasan,
+    // SEMUA baris dianggap pembahasan.
+    if (isDiscussion) {
+  discussionLines.push(line);
+  return;
+}
+
+    // =========================
+    // DETEKSI OPSI
+    // =========================
+    const optionMatch = line.match(
+      /^([A-E])\s*[\.\)]\s+(.*)$/i
+    );
+
+    if (optionMatch) {
+      const optionIndex = getAnswerIndex(
+        optionMatch[1]
       );
 
-      if (answerMatch) {
-        answerIndex = getAnswerIndex(answerMatch[1]);
-        currentOption = null;
+      /*
+       * Kasus penting:
+       *
+       * A. dorsalis pedis merupakan lanjutan dari...
+       *
+       * Ini adalah SOAL, bukan pilihan.
+       *
+       * Sedangkan:
+       *
+       * A. A. tibialis posterior
+       *
+       * adalah pilihan.
+       */
+
+      const textAfterLabel =
+        optionMatch[2]?.trim() || "";
+
+      const looksLikeAnatomyStatement =
+        /^a\.\s+/i.test(textAfterLabel) ||
+        /^v\.\s+/i.test(textAfterLabel) ||
+        /^n\.\s+/i.test(textAfterLabel) ||
+        /^m\.\s+/i.test(textAfterLabel) ||
+        /^r\.\s+/i.test(textAfterLabel);
+
+      // Kalau ini A. + istilah anatomi,
+      // dan opsi belum dimulai → anggap sebagai soal.
+      if (
+        !optionsStarted &&
+        optionIndex === 0 &&
+        looksLikeAnatomyStatement
+      ) {
+        questionLines.push(line);
         return;
       }
 
-      const discussionMatch = line.match(
-        /^(?:pembahasan|bahasan|penjelasan|discussion|rationale)\s*[:=\-]?\s*(.*)$/i
-      );
+      optionsStarted = true;
 
-      if (discussionMatch) {
-        isDiscussion = true;
-        currentOption = null;
+      optionMap[optionIndex] = textAfterLabel;
+      currentOption = optionIndex;
 
-        const discussionText = discussionMatch[1]?.trim();
-        if (discussionText) discussionLines.push(discussionText);
+      return;
+    }
 
-        return;
-      }
+    // =========================
+    // LANJUTAN PILIHAN
+    // =========================
+    if (
+      optionsStarted &&
+      currentOption !== null
+    ) {
+      optionMap[currentOption] +=
+        (optionMap[currentOption] ? " " : "") +
+        line;
 
-      if (isDiscussion) {
-        discussionLines.push(line);
-        return;
-      }
+      return;
+    }
 
-      const optionMatch = line.match(/^([A-E])\s*[\.\)]\s*(.*)$/i);
+    // =========================
+    // BAGIAN SOAL
+    // =========================
+    questionLines.push(line);
+  });
 
-      if (optionMatch) {
-        const optionIndex = getAnswerIndex(optionMatch[1]);
-        optionMap[optionIndex] = optionMatch[2]?.trim() || "";
-        currentOption = optionIndex;
-        return;
-      }
-
-      if (currentOption !== null && optionMap[currentOption]) {
-        optionMap[currentOption] += " " + line;
-        return;
-      }
-
-      questionLines.push(line);
-    });
-
-    return {
-  id: crypto.randomUUID(),
-  topic: "",
-  difficulty: "medium",
-  question: questionLines.join("\n").trim(),
-  options: optionMap,
-  answer: answerIndex,
-  discussion: discussionLines.join("\n").trim(),
-};
+  return {
+    id: crypto.randomUUID(),
+    topic: "",
+    question: questionLines.join(" ").replace(/\s+/g, " ").trim(),
+    options: optionMap,
+    answer: answerIndex,
+    discussion: discussionLines.join(" ").replace(/\s+/g, " ").trim(),
+    difficulty: "medium",
   };
+};
 
   const parseQuestionsFromText = () => {
     if (!importText.trim()) return alert("Paste soal dulu!");
