@@ -1222,11 +1222,15 @@ if (soalError) {
               onChange={(e) => setImportText(e.target.value)}
               placeholder={`Format disarankan:
 
+Topic: Jantung
+Tingkat Kesulitan: Sedang
+
 1. Pernyataan yang benar tentang anatomi jantung adalah...
 1) Atrium kanan menerima darah vena
 2) Ventrikel kiri memompa darah ke aorta
 3) Katup trikuspid berada di sisi kanan
 4) Vena pulmonalis membawa darah miskin oksigen
+
 A. 1, 2, dan 3
 B. 1 dan 3
 C. 2 dan 4
@@ -1234,7 +1238,8 @@ D. 4 saja
 E. Semua benar
 
 Jawaban: A
-Pembahasan: 
+
+Pembahasan:
 Pernyataan 1, 2, dan 3 benar karena sesuai dengan alur sirkulasi jantung.`}
             />
 
