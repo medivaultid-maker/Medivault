@@ -338,15 +338,57 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     .replace(/[“”]/g, '"')
     .replace(/[‘’]/g, "'")
     .replace(/[–—]/g, "-")
+
+    // Rapikan spasi/tab
     .replace(/[ \t]+/g, " ")
+
+    // Pisahkan metadata
+    .replace(
+      /\s+(?=Topic\s*:)/gi,
+      "\n"
+    )
+    .replace(
+      /\s+(?=Tingkat\s+Kesulitan\s*:)/gi,
+      "\n"
+    )
+
+    // Pisahkan Jawaban
     .replace(
       /\s+(?=(?:Kunci\s*)?Jawaban\s*[:=\-])/gi,
       "\n"
     )
+
+    // Pisahkan Pembahasan
     .replace(
       /\s+(?=(?:Pembahasan|Bahasan|Penjelasan|Discussion|Rationale)\s*[:=\-]?)/gi,
       "\n"
     )
+
+    // ==========================================
+    // PENTING:
+    // Pisahkan pilihan A-E yang menempel
+    // dengan teks sebelumnya.
+    //
+    // Contoh:
+    // "... adalah... A. N. ischiadicus"
+    //
+    // menjadi:
+    // "... adalah..."
+    // "A. N. ischiadicus"
+    // ==========================================
+
+    .replace(
+      /([^\n])\s+([A-E])\.\s+(?=(?:A\.\s*)?[A-Za-z])/g,
+      "$1\n$2. "
+    )
+
+    // Juga support A) B) C) dst.
+    .replace(
+      /([^\n])\s+([A-E])\)\s+(?=(?:A\)\s*)?[A-Za-z])/g,
+      "$1\n$2) "
+    )
+
+    // Rapikan newline berlebihan
     .replace(/\n{3,}/g, "\n\n")
     .trim();
 };
