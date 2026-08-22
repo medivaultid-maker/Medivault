@@ -140,12 +140,7 @@ export default function SimulasiPage() {
         <span style={styles.arrow}>›</span>
       </Link>
 
-      <Link href="/paket/biokimia-praktikum" style={styles.option}>
-        <div>
-          <h3 style={styles.optionTitle}>Praktikum Biokimia</h3>
-        </div>
-        <span style={styles.arrow}>›</span>
-      </Link>
+      
     </div>
   </div>
 
@@ -208,12 +203,6 @@ export default function SimulasiPage() {
       <span style={styles.arrow}>›</span>
     </Link>
 
-    <Link href="/paket/mikrobiologi-praktikum" style={styles.option}>
-      <div>
-        <h3 style={styles.optionTitle}>Praktikum Mikrobiologi</h3>
-      </div>
-      <span style={styles.arrow}>›</span>
-    </Link>
   </div>
 </div>
 </div>

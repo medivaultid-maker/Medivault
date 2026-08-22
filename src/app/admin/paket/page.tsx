@@ -335,61 +335,79 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
   return text
     .replace(/\r/g, "\n")
     .replace(/\u00A0/g, " ")
+
+    // Rapikan tanda kutip
     .replace(/[“”]/g, '"')
     .replace(/[‘’]/g, "'")
+
+    // Rapikan dash
     .replace(/[–—]/g, "-")
 
     // Rapikan spasi/tab
     .replace(/[ \t]+/g, " ")
 
-    // Pisahkan metadata
+    // ==========================================
+    // PASTIKAN METADATA BERADA DI BARIS SENDIRI
+    // ==========================================
+
     .replace(
       /\s+(?=Topic\s*:)/gi,
       "\n"
     )
+
     .replace(
       /\s+(?=Tingkat\s+Kesulitan\s*:)/gi,
       "\n"
     )
 
-    // Pisahkan Jawaban
+    // ==========================================
+    // PISAHKAN JAWABAN
+    // ==========================================
+
     .replace(
       /\s+(?=(?:Kunci\s*)?Jawaban\s*[:=\-])/gi,
       "\n"
     )
 
-    // Pisahkan Pembahasan
+    // ==========================================
+    // PISAHKAN PEMBAHASAN
+    // ==========================================
+
     .replace(
       /\s+(?=(?:Pembahasan|Bahasan|Penjelasan|Discussion|Rationale)\s*[:=\-]?)/gi,
       "\n"
     )
 
     // ==========================================
-    // PENTING:
-    // Pisahkan pilihan A-E yang menempel
-    // dengan teks sebelumnya.
+    // PISAHKAN PILIHAN A-E
     //
     // Contoh:
-    // "... adalah... A. N. ischiadicus"
+    //
+    // "... adalah A. Aorta B. Vena cava"
     //
     // menjadi:
-    // "... adalah..."
-    // "A. N. ischiadicus"
+    //
+    // "... adalah"
+    // "A. Aorta"
+    // "B. Vena cava"
     // ==========================================
 
     .replace(
-      /([^\n])\s+([A-E])\.\s+(?=(?:A\.\s*)?[A-Za-z])/g,
+      /([^\n])\s+([A-E])\.\s+(?=[A-Za-z0-9])/g,
       "$1\n$2. "
     )
 
-    // Juga support A) B) C) dst.
     .replace(
-      /([^\n])\s+([A-E])\)\s+(?=(?:A\)\s*)?[A-Za-z])/g,
+      /([^\n])\s+([A-E])\)\s+(?=[A-Za-z0-9])/g,
       "$1\n$2) "
     )
 
-    // Rapikan newline berlebihan
+    // ==========================================
+    // Rapikan newline
+    // ==========================================
+
     .replace(/\n{3,}/g, "\n\n")
+
     .trim();
 };
 
@@ -407,58 +425,203 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
 };
 
   const splitQuestionBlocks = (text: string) => {
-    const marked = ("\n" + text).replace(
-      /\n\s*(\d{1,3})\s*[\.\)]\s+/g,
-      "\n@@Q@@$1. "
+  const lines = text
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  const blocks: string[] = [];
+
+  let currentLines: string[] = [];
+
+  // ==========================================
+  // CEK APAKAH BARIS ADALAH NOMOR SOAL
+  // ==========================================
+
+  const isQuestionNumber = (line: string) => {
+    const match = line.match(
+      /^(\d{1,3})\s*[.)]\s+/
     );
 
-    const segments = marked
-      .split("@@Q@@")
-      .map((s) => s.trim())
-      .filter(Boolean);
+    if (!match) return false;
 
-    const blocks: string[] = [];
-    let current = "";
+    const number = Number(match[1]);
 
-    for (const segment of segments) {
-      if (!current) {
-        current = segment;
-        continue;
+    // Nomor 1-4 TIDAK langsung dianggap soal baru.
+    // Kita hanya mengizinkan nomor besar seperti:
+    // 5. 6. 7. dst.
+    //
+    // Untuk nomor 1-4, kita cek berdasarkan
+    // apakah blok sebelumnya sudah selesai.
+
+    return number >= 1;
+  };
+
+  // ==========================================
+  // CEK APAKAH BLOK SUDAH SELESAI
+  // ==========================================
+
+  const hasAnswer = (lines: string[]) => {
+    return lines.some((line) =>
+      /^(?:kunci\s*)?(?:jawaban|answer|ans)\s*[:=\-]/i.test(
+        line
+      )
+    );
+  };
+
+  const hasDiscussion = (lines: string[]) => {
+    return lines.some((line) =>
+      /^(?:pembahasan|bahasan|penjelasan|discussion|rationale)\s*:/i.test(
+        line
+      )
+    );
+  };
+
+  const hasTopic = (lines: string[]) => {
+    return lines.some((line) =>
+      /^topic\s*:/i.test(line)
+    );
+  };
+
+  const hasDifficulty = (lines: string[]) => {
+    return lines.some((line) =>
+      /^tingkat\s+kesulitan\s*:/i.test(line)
+    );
+  };
+
+  // ==========================================
+  // LOOP SEMUA BARIS
+  // ==========================================
+
+  lines.forEach((line) => {
+    const numberMatch = line.match(
+      /^(\d{1,3})\s*[.)]\s+/
+    );
+
+    const number = numberMatch
+      ? Number(numberMatch[1])
+      : null;
+
+    // ==========================================
+    // TENTUKAN APAKAH INI NOMOR SOAL BARU
+    // ==========================================
+
+    let newQuestion = false;
+
+    if (
+      number !== null &&
+      currentLines.length > 0
+    ) {
+      // ----------------------------------------
+      // Kalau blok sebelumnya SUDAH lengkap
+      // sampai Topic + Difficulty,
+      // nomor berapa pun = soal baru.
+      // ----------------------------------------
+
+      if (
+        hasTopic(currentLines) &&
+        hasDifficulty(currentLines)
+      ) {
+        newQuestion = true;
       }
 
-      if (hasEnoughOptions(current)) {
-        blocks.push(current.trim());
-        current = segment;
-      } else {
-        current += "\n" + segment;
+      // ----------------------------------------
+      // Kalau sudah ada Answer + Discussion +
+      // metadata sebagian, kemungkinan besar
+      // nomor berikutnya adalah soal baru.
+      // ----------------------------------------
+
+      else if (
+        hasAnswer(currentLines) &&
+        hasDiscussion(currentLines) &&
+        (
+          hasTopic(currentLines) ||
+          hasDifficulty(currentLines)
+        )
+      ) {
+        newQuestion = true;
+      }
+
+      // ----------------------------------------
+      // Kalau nomor > 4 dan blok sebelumnya
+      // sudah punya pilihan + jawaban,
+      // anggap sebagai soal baru.
+      // ----------------------------------------
+
+      else if (
+        number > 4 &&
+        hasAnswer(currentLines)
+      ) {
+        newQuestion = true;
       }
     }
 
-    if (current.trim()) blocks.push(current.trim());
+    // ==========================================
+    // JIKA SOAL BARU
+    // ==========================================
 
-    return blocks;
-  };
+    if (newQuestion) {
+      blocks.push(
+        currentLines.join("\n").trim()
+      );
+
+      currentLines = [line];
+      return;
+    }
+
+    // ==========================================
+    // JIKA BUKAN SOAL BARU
+    // ==========================================
+
+    currentLines.push(line);
+  });
+
+  // ==========================================
+  // PUSH BLOK TERAKHIR
+  // ==========================================
+
+  if (currentLines.length > 0) {
+    blocks.push(
+      currentLines.join("\n").trim()
+    );
+  }
+
+  return blocks;
+};
 
   const parseSingleQuestionBlock = (
   block: string
 ): QuestionItem => {
   const lines = block
     .split("\n")
-    .map((l) => l.trim())
+    .map((line) => line.trim())
     .filter(Boolean);
+
+  // ==========================================
+  // DATA HASIL PARSING
+  // ==========================================
 
   const questionLines: string[] = [];
   const discussionLines: string[] = [];
 
-  const optionMap = ["", "", "", "", ""];
+  const optionMap = [
+    "",
+    "",
+    "",
+    "",
+    "",
+  ];
 
   let currentOption: number | null = null;
+
   let answerIndex = 0;
+
   let isDiscussion = false;
+
   let optionsStarted = false;
 
   // ==========================================
-  // AMBIL TOPIC PER SOAL
+  // TOPIC
   // ==========================================
 
   let topic = "";
@@ -472,29 +635,38 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
   }
 
   // ==========================================
-  // AMBIL TINGKAT KESULITAN PER SOAL
+  // DIFFICULTY
   // ==========================================
+
+  let difficulty:
+    | "easy"
+    | "medium"
+    | "hard" = "medium";
 
   const difficultyMatch = block.match(
     /(?:^|\n)\s*Tingkat\s+Kesulitan\s*:\s*(.+?)(?=\n|$)/i
   );
 
   const difficultyText =
-    difficultyMatch?.[1]?.trim().toLowerCase() || "";
-
-  let difficulty: "easy" | "medium" | "hard" = "medium";
+    difficultyMatch?.[1]
+      ?.trim()
+      .toLowerCase() || "";
 
   if (
     difficultyText === "mudah" ||
     difficultyText === "easy"
   ) {
     difficulty = "easy";
-  } else if (
+  }
+
+  if (
     difficultyText === "sulit" ||
     difficultyText === "hard"
   ) {
     difficulty = "hard";
-  } else if (
+  }
+
+  if (
     difficultyText === "sedang" ||
     difficultyText === "medium"
   ) {
@@ -502,7 +674,7 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
   }
 
   // ==========================================
-  // PARSE ISI SOAL
+  // LOOP BARIS
   // ==========================================
 
   lines.forEach((rawLine, index) => {
@@ -511,29 +683,41 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     if (!line) return;
 
     // ==========================================
-    // HAPUS NOMOR SOAL
+    // HAPUS NOMOR SOAL PADA BARIS PERTAMA
+    //
+    // 1. Pernyataan...
+    //
+    // menjadi:
+    //
+    // Pernyataan...
     // ==========================================
 
     if (index === 0) {
       line = line
-        .replace(/^\d{1,3}\s*[.)]\s*/, "")
+        .replace(
+          /^\d{1,3}\s*[.)]\s*/,
+          ""
+        )
         .trim();
     }
 
     // ==========================================
-    // JANGAN MASUKKAN METADATA KE ISI
+    // METADATA
+    // Jangan masuk ke question/discussion
     // ==========================================
 
     if (/^topic\s*:/i.test(line)) {
       return;
     }
 
-    if (/^tingkat\s+kesulitan\s*:/i.test(line)) {
+    if (
+      /^tingkat\s+kesulitan\s*:/i.test(line)
+    ) {
       return;
     }
 
     // ==========================================
-    // KUNCI JAWABAN
+    // JAWABAN
     // ==========================================
 
     const answerMatch = line.match(
@@ -541,8 +725,12 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     );
 
     if (answerMatch) {
-      answerIndex = getAnswerIndex(answerMatch[1]);
+      answerIndex = getAnswerIndex(
+        answerMatch[1]
+      );
+
       currentOption = null;
+
       return;
     }
 
@@ -556,13 +744,16 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
 
     if (discussionMatch) {
       isDiscussion = true;
+
       currentOption = null;
 
       const discussionText =
         discussionMatch[1]?.trim();
 
       if (discussionText) {
-        discussionLines.push(discussionText);
+        discussionLines.push(
+          discussionText
+        );
       }
 
       return;
@@ -578,7 +769,7 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     }
 
     // ==========================================
-    // DETEKSI PILIHAN A-E
+    // PILIHAN A-E
     // ==========================================
 
     const optionMatch = line.match(
@@ -586,7 +777,9 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     );
 
     if (optionMatch) {
-      const label = optionMatch[1].toUpperCase();
+      const label =
+        optionMatch[1].toUpperCase();
+
       const textAfterLabel =
         optionMatch[2]?.trim() || "";
 
@@ -594,18 +787,24 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
         getAnswerIndex(label);
 
       // ==========================================
-      // KASUS KHUSUS ANATOMI
+      // KHUSUS ANATOMI
+      //
+      // Contoh:
       //
       // A. dorsalis pedis merupakan...
       //
-      // bukan pilihan, tetapi bagian dari soal.
+      // Ini bukan pilihan A.
       // ==========================================
 
-      const isDoubleLabel =
-        /^A\.\s*A\./i.test(textAfterLabel);
-
       const looksLikeAnatomyStatement =
-        /^a\.\s+/i.test(textAfterLabel);
+        /^A\.\s+/i.test(
+          textAfterLabel
+        );
+
+      const isDoubleLabel =
+        /^A\.\s*A\./i.test(
+          textAfterLabel
+        );
 
       if (
         !optionsStarted &&
@@ -614,11 +813,12 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
         !isDoubleLabel
       ) {
         questionLines.push(line);
+
         return;
       }
 
       // ==========================================
-      // BENAR-BENAR PILIHAN
+      // PILIHAN BENAR
       // ==========================================
 
       optionsStarted = true;
@@ -626,13 +826,14 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
       optionMap[optionIndex] =
         textAfterLabel;
 
-      currentOption = optionIndex;
+      currentOption =
+        optionIndex;
 
       return;
     }
 
     // ==========================================
-    // LANJUTAN PILIHAN
+    // LANJUTAN TEKS PILIHAN
     // ==========================================
 
     if (
@@ -640,34 +841,62 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
       currentOption !== null
     ) {
       optionMap[currentOption] +=
-        (optionMap[currentOption]
-          ? " "
-          : "") + line;
+        (
+          optionMap[currentOption]
+            ? " "
+            : ""
+        ) + line;
 
       return;
     }
 
     // ==========================================
-    // BAGIAN SOAL
+    // PERNYATAAN 1-4
+    //
+    // INI SANGAT PENTING
+    //
+    // 1. M. iliopsoas...
+    // 2. M. quadriceps...
+    // 3. M. sartorius...
+    // 4. M. gastrocnemius...
+    //
+    // Semuanya masuk ke QUESTION.
+    // ==========================================
+
+    const statementMatch = line.match(
+      /^([1-4])\s*[.)]\s+(.+)$/i
+    );
+
+    if (statementMatch) {
+      questionLines.push(
+        `${statementMatch[1]}. ${statementMatch[2]}`
+      );
+
+      return;
+    }
+
+    // ==========================================
+    // BAGIAN SOAL BIASA
     // ==========================================
 
     questionLines.push(line);
   });
 
+  // ==========================================
+  // HASIL AKHIR
+  // ==========================================
+
   return {
     id: crypto.randomUUID(),
-
-    // ==========================================
-    // SEKARANG PER SOAL
-    // ==========================================
 
     topic,
 
     difficulty,
 
     question: questionLines
-      .join(" ")
-      .replace(/\s+/g, " ")
+      .join("\n")
+      .replace(/[ \t]+/g, " ")
+      .replace(/\n{2,}/g, "\n")
       .trim(),
 
     options: optionMap,
@@ -687,35 +916,60 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
   }
 
   // ==========================================
-  // 1. NORMALISASI TEXT
+  // 1. NORMALISASI
   // ==========================================
 
   const cleanText =
     normalizeImportText(importText);
 
   // ==========================================
-  // 2. JANGAN HAPUS TOPIC / DIFFICULTY
-  //
-  // Karena sekarang metadata memang milik
-  // masing-masing soal.
+  // 2. PECAH SOAL
   // ==========================================
 
   const blocks =
     splitQuestionBlocks(cleanText);
 
+  console.log(
+    "================================="
+  );
+
+  console.log(
+    "JUMLAH BLOCK:",
+    blocks.length
+  );
+
   // ==========================================
-  // 3. PARSE SETIAP SOAL
+  // 3. PARSE SETIAP BLOCK
   // ==========================================
 
   const parsed = blocks
-    .map((block) =>
-      parseSingleQuestionBlock(block)
-    )
+    .map((block, index) => {
+      const result =
+        parseSingleQuestionBlock(block);
+
+      console.log(
+        `SOAL ${index + 1}:`,
+        {
+          topic: result.topic,
+          difficulty:
+            result.difficulty,
+          question:
+            result.question,
+          answer:
+            result.answer,
+          discussion:
+            result.discussion,
+        }
+      );
+
+      return result;
+    })
     .filter(
       (q) =>
         q.question ||
         q.options?.some(
-          (opt) => opt.trim()
+          (opt) =>
+            opt.trim()
         )
     );
 
@@ -729,60 +983,22 @@ const answerRefs = useRef<HTMLInputElement[]>([]);
     );
   }
 
-  // ==========================================
-  // 5. DEBUG
-  // ==========================================
-
   console.log(
-    "===================================="
+    "================================="
   );
 
   console.log(
-    "HASIL IMPORT SOAL:"
+    "HASIL AKHIR:",
+    parsed
   );
 
-  parsed.forEach((q, index) => {
-    console.log(
-      `SOAL ${index + 1}`
-    );
-
-    console.log(
-      "Topic:",
-      q.topic
-    );
-
-    console.log(
-      "Difficulty:",
-      q.difficulty
-    );
-
-    console.log(
-      "Question:",
-      q.question
-    );
-
-    console.log(
-      "Answer:",
-      q.answer
-    );
-
-    console.log(
-      "Discussion:",
-      q.discussion
-    );
-
-    console.log(
-      "--------------------"
-    );
-  });
-
   console.log(
-    "JUMLAH SOAL =",
+    "JUMLAH SOAL:",
     parsed.length
   );
 
   // ==========================================
-  // 6. MASUKKAN KE FORM
+  // 5. MASUKKAN KE FORM
   // ==========================================
 
   setQuestions(parsed);
@@ -1295,9 +1511,6 @@ if (soalError) {
               onChange={(e) => setImportText(e.target.value)}
               placeholder={`Format disarankan:
 
-Topic: Jantung
-Tingkat Kesulitan: Sedang
-
 1. Pernyataan yang benar tentang anatomi jantung adalah...
 1) Atrium kanan menerima darah vena
 2) Ventrikel kiri memompa darah ke aorta
@@ -1313,7 +1526,10 @@ E. Semua benar
 Jawaban: A
 
 Pembahasan:
-Pernyataan 1, 2, dan 3 benar karena sesuai dengan alur sirkulasi jantung.`}
+Pernyataan 1, 2, dan 3 benar karena sesuai dengan alur sirkulasi jantung.
+
+Topic: Jantung
+Tingkat Kesulitan: Sedang`}
             />
 
             <div className="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 px-4 py-3 text-sm leading-6 text-emerald-800">

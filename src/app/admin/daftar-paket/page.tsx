@@ -112,26 +112,22 @@ const { data, error } = await supabase
   };
 
   const deletePackage = async (id: string) => {
-  if (!confirm("Hapus paket ini beserta semua soal?")) return;
+  if (!confirm("Hapus paket ini beserta semua data ujian terkait?")) return;
 
-  // hapus soal
-  await supabase
-    .from("questions")
-    .delete()
-    .eq("package_id", id);
-
-  // hapus paket
   const { error } = await supabase
     .from("exam_packages")
     .delete()
     .eq("id", id);
 
   if (error) {
-    alert("Gagal menghapus paket");
+    console.error("Gagal menghapus paket:", error);
+    alert(`Gagal menghapus paket: ${error.message}`);
     return;
   }
 
-  setPackages(prev => prev.filter(p => p.id !== id));
+  setPackages((prev) => prev.filter((p) => p.id !== id));
+
+  alert("Paket berhasil dihapus!");
 };
 
 const toggleStatus = async (
