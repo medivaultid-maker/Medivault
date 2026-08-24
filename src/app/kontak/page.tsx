@@ -93,7 +93,7 @@ ${form.pesan}
                   </h3>
 
                   <p className="mt-2 text-slate-600">
-                    @medivaultid
+                    @medivault.id
                   </p>
                 </div>
               </div>

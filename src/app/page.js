@@ -86,7 +86,6 @@ const handleSubscribe = async () => {
 
   const yBg1 = useTransform(scrollY, [0, 300], [0, 120]);
   const yBg2 = useTransform(scrollY, [0, 300], [0, -100]);
-  const yHero = useTransform(scrollY, [0, 300], [0, -35]);
 
   const stats = [
     {
@@ -118,8 +117,7 @@ const handleSubscribe = async () => {
         />
 
         <motion.div
-          style={{ y: yHero }}
-          initial={{ opacity: 0, y: 38 }}
+  initial={{ opacity: 0, y: 38 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7 }}
           className="relative mx-auto flex max-w-7xl flex-col items-center justify-between gap-12 rounded-[36px] border border-white/70 bg-white/75 p-6 shadow-[0_30px_90px_rgba(6,27,58,0.10)] backdrop-blur-xl md:flex-row md:p-10"
@@ -156,7 +154,7 @@ text-[#234F42]">
               </div>
             </div>
 
-            <div className="mt-8 grid max-w-xl grid-cols-1 gap-3 sm:grid-cols-2">
+            <div className="mt-8 grid max-w-xl grid-cols-3 gap-5">
               <div className="flex items-center gap-2 text-sm font-semibold text-slate-600">
                 <CheckCircle2 size={17} className="text-[#0F766E]" />
                 Pembahasan Soal
@@ -272,7 +270,7 @@ text-[#234F42]">
       </section>
 
       {/* STATS */}
-<section id="fitur" className="px-6 pb-8 md:px-12">
+<section id="fitur" className="px-6 pt-8 pb-8 md:px-12">
         <div className="mx-auto grid max-w-7xl gap-6 md:grid-cols-2">
           {stats.map((item, i) => (
             <motion.div
@@ -386,17 +384,6 @@ text-[#234F42]">
   </h3>
 
   <ul className="space-y-3 text-sm font-medium text-slate-500">
-    <li>
-      <Link href="/tentang-kami" className="transition hover:text-[#0F766E]">
-        Tentang Kami
-      </Link>
-    </li>
-
-    <li>
-      <Link href="/blog" className="transition hover:text-[#0F766E]">
-        Blog
-      </Link>
-    </li>
 
     <li>
       <Link href="/faq" className="transition hover:text-[#0F766E]">

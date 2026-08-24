@@ -88,6 +88,7 @@ setLoadingRole(false);
   { label: "Simulasi", href: "/simulasi" },
   { label: "Akses Latihan", href: "/token" },
   { label: "Materi Kedokteran", href: "/materi" },
+  { label: "Tentang Kami", href: "/tentang-kami" },
 ];
 
   const adminLinks: NavItem[] = [
